@@ -1,0 +1,83 @@
+#!/bin/sh
+
+HF=config.h
+CF=config.in
+
+BEGIN()
+{
+	> $CF
+	echo "#ifndef __CONFIG_H__\n#define __CONFIG_H__\n" > $HF
+}
+
+END()
+{
+	echo "\n#endif" >> $HF
+}
+
+P()
+{
+	echo "\n########################################\n# $1\n########################################" >> $CF
+	echo "\n########################################\n# $1\n########################################"
+}
+
+L()
+{
+	read -p "$1 installed location ? [$2] " ans
+	if [ "$ans" = "" ]; then ans="$2"; fi
+	echo "$3 = $ans" >> $CF
+}
+
+S()
+{
+	ret=0
+	read -p "$1 support ? [$2] " ans
+	if [ "$ans" = "" ]; then ans="$2"; fi
+	if [ "$ans" = "y" ]; then
+		echo "#define $3 1"
+	else
+		echo "#undef $3"
+		ret=1
+	fi >> $HF
+	echo "$3 = $ans" >> $CF
+	return $ret
+}
+
+######################################################
+# MAIN ROUTINE
+######################################################
+BEGIN
+
+P "mono config:"
+L "mono" "$HOME/local/mono" "LOCATION_MONO"
+
+P "ssl config:"
+L "ssl" "$HOME/local/openssl" "LOCATION_SSL"
+
+P "fcgi config:"
+L "fcgi" "$HOME/local/fcgi" "LOCATION_FCGI"
+
+P "curl config:"
+L "curl" "$HOME/local/curl" "LOCATION_CURL"
+if `S "c_ares" y "SUPPORT_C_ARES"`; then
+	L "c_ares" "$HOME/local/c-ares" "LOCATION_C_ARES"
+fi
+
+P "memcached config:"
+if `S "memcached" y "SUPPORT_MEMCACHED"`; then
+	L "memcached" "$HOME/local/libmemcached" "LOCATION_MEMCACHED"
+fi
+
+P "redis config:"
+if `S "redis" y "SUPPORT_REDIS"`; then
+	L "hiredis" "$HOME/local/hiredis" "LOCATION_HIREDIS"
+fi
+
+P "smtp config:"
+S "smtp" y "SUPPORT_SMTP"
+
+END
+
+echo
+echo "The irma is now hopefully configured for your setup."
+echo "Check the config.in & config.h files and do 'make' to build it."
+echo

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ $# -eq 1 ]; then
+	dll="$1"
+	ps aux | grep "^`whoami`.*irmacall -t" | grep -v "grep" | grep $dll | awk '{ print $2; }' | xargs kill -SIGINT
+fi

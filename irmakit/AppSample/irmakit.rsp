@@ -1,0 +1,9 @@
+-r:System.dll
+-r:System.Data.dll
+-r:System.Web.dll
+-r:Lib/BeIT.MemCached.dll
+-r:Lib/MySql.Data-6.6.7.0.dll
+-r:Lib/Newtonsoft.Json.dll
+-r:Lib/NVelocity.dll
+-r:Lib/zxing-0.16.5.0.dll
+-r:Lib/IRMAKit.dll

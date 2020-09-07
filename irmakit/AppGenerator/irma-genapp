@@ -1,0 +1,60 @@
+#!/bin/sh
+
+mono=`which mono`
+assembly=$HOME/local/irma/assembly
+AppGenerator=$assembly/AppGenerator.exe
+AppSample=$assembly/AppSample
+
+if [ $# -eq 1 ]; then
+	app="$1"
+	mock=0
+elif [ $# -eq 2 -a "$2" = "-m" ]; then
+	app="$1"
+	mock=1
+else
+	echo "usage: irma-genapp [appname] [-m]"
+	echo
+	exit
+fi
+
+# Generate app
+if [ -e $app ]; then rm -rf $app; fi
+mkdir $app
+mkdir $app/conf
+mkdir $app/Properties
+mkdir $app/Web
+mkdir $app/documents
+mkdir $app/documents/html
+mkdir $app/documents/html/n
+mkdir $app/documents/html/c
+echo "1.html ..." > $app/documents/html/n/1.html
+echo "2.html (The content of this page is protected and you are required to login to read it) ..." > $app/documents/html/c/2.html
+mkdir $app/documents/js
+mkdir $app/documents/js/n
+mkdir $app/documents/js/c
+echo "alert(\"/s/n/1.js\");" > $app/documents/js/n/1.js
+echo "alert(\"/s/c/2.js\");" > $app/documents/js/c/2.js
+mkdir $app/documents/css
+mkdir $app/documents/image
+mkdir $app/Lib
+cp $AppSample/irmakit.rsp $app/
+cp -d $assembly/*.dll $app/Lib/
+
+# Generate mock
+if [ $mock -eq 1 ]; then
+	rm -rf ${app}Mock
+	mkdir ${app}Mock
+	mkdir ${app}Mock/App_Code
+fi
+
+$mono $AppGenerator $AppSample $app $app $mock 2>&1 1>/dev/null
+
+chmod +x $app/*.sh
+
+if [ $mock -eq 1 ]; then
+	echo "Generated projects: '$app' and '${app}Mock' (which is for Windows OS). Check pls !"
+	echo
+else
+	echo "Generated project: '$app'. Check pls !"
+	echo
+fi

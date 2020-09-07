@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ $# -eq 1 ]; then
+	dll="$1"
+	count=$(ps aux | grep "^`whoami`.*irmacall -t" | grep -v "grep" | grep $dll | wc -l)
+	if [ $count -gt 0 ]; then
+		ps aux | grep "^`whoami`.*irmacall -t" | grep -v "grep" | grep $dll | awk '{ print $2; }' | xargs kill -s 64
+		sleep 2
+		log="irma_`date +%Y%m%d`.log"
+		echo "Information on runtime as below (refer to log/debug/$log):"
+		echo
+		find Bin/*/log/debug -name "$log" | xargs tail -n 500 | grep "Core - Runtime=" | sort | tail -n $count
+		echo
+	fi
+fi

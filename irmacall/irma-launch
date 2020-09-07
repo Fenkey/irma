@@ -1,0 +1,89 @@
+#!/bin/sh
+
+dll=
+klass=
+config=
+process_count=1
+thread_count=1
+log_type="event"
+mock_support=
+waiting=1
+
+set -- `getopt -o d:k:c:p:x:t:w:m -- "$@"`
+
+while [ -n "$1" ]; do
+	case "$1" in
+	-d)
+		dll=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	-k)
+		klass=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	-c)
+		config=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	-p)
+		process_count=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	-x)
+		thread_count=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	-t)
+		log_type=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	-m)
+		mock_support="-k"
+		shift
+		;;
+	-w)
+		waiting=`echo $2 | sed "s/'//g"`
+		shift
+		;;
+	--)
+		break
+		;;
+	*)
+		echo "wrong: $1"
+		;;
+	esac
+	shift
+done
+
+module="$klass,$dll"
+
+. $HOME/.bash_profile &>/dev/null
+
+today=`date +%Y%m%d`
+md5=`which md5sum || which md5`
+spawn=`which spawn-fcgi`
+sock=`dirname $dll`/irma.sock
+irmacall=`which irmacall`
+if [ -x irmacall ]; then irmacall=`pwd`/irmacall; fi
+
+fatal()
+{
+	echo "!!!!!!!!!!!!!"
+	echo "!!! FATAL !!! - Fail to launch project '`basename $dll`' ! check log files pls."
+	echo "!!!!!!!!!!!!!"
+	exit 1
+}
+
+# Launch it.
+oldsum="`cat Bin/*/log/fatal/irma_$today.log 2>/dev/null | $md5`"
+$spawn -f "$irmacall -t $log_type -x $thread_count -m $module -c $config $mock_support" -s $sock -F $process_count
+
+sleep $waiting
+
+# Check by log information.
+newsum="`cat Bin/*/log/fatal/irma_$today.log 2>/dev/null | $md5`"
+if [ "$newsum" != "$oldsum" ]; then fatal; fi
+
+# Check by process.
+ps aux | grep "^`whoami`.*irmacall.*-m $module" | grep -v grep >/dev/null 2>&1
+if [ $? -ne 0 ]; then fatal; fi
