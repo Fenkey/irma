@@ -4,7 +4,7 @@
 #define FUSE_RISK_TW		600
 #define FUSE_ABSOLUTE_MAX	12
 #define FUSE_RATE_MIN		6
-#define FUSE_RT				0.94 /* about (16/17) */
+#define FUSE_RT				0.94 /* About (16/17) */
 
 static void fuse_reset(fuse_t *f, int fuse_times_reset)
 {

@@ -6,8 +6,8 @@
 #include "list.h"
 #include "form_param.h"
 
-#define FPLI	((fparamlist_inner_t*)fplist->priv)
-#define FPPI	((fparamparser_inner_t*)parser->priv)
+#define FPLI ((fparamlist_inner_t*)fplist->priv)
+#define FPPI ((fparamparser_inner_t*)parser->priv)
 
 typedef struct {
 	int local;

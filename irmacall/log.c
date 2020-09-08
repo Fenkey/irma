@@ -20,7 +20,8 @@
 #define _L_(d)			LOGDIR"/"#d
 #define LOG_COUNT		6
 #define BUF_COUNT_MIN	100
-#define LI				((log_inner_t*)log->priv)
+
+#define LI ((log_inner_t*)log->priv)
 
 typedef struct {
 	int fd;

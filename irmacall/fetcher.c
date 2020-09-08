@@ -8,8 +8,8 @@
 #include "misc.h"
 #include "fetcher.h"
 
-#define CONNECT_TIMEOUT_DEFAULT		3
-#define READ_TIMEOUT_DEFAULT		16
+#define CONNECT_TIMEOUT_DEFAULT 3
+#define READ_TIMEOUT_DEFAULT 16
 #define FI ((fetcher_inner_t*)f->priv)
 
 typedef struct {

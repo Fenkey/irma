@@ -9,18 +9,17 @@
 
 #define BUFMIN			4
 #define BUFLINE_MAX		1024
-
 #define DEL_MINSIZE		10240
 #define DEL_TIMES		200
 #define RENEW_TIMES		100
 #define RENEW_UR		0.618
 #define RENEW_SFTIMES	3
-
 #define BPF_LENT		0x01
 #define BPF_AUTO		0x02
 #define BUF_COUNT_MIN	4
-#define BI				((buf_inner_t*)buf->priv)
-#define PI				((pool_inner_t*)pool->priv)
+
+#define BI ((buf_inner_t*)buf->priv)
+#define PI ((pool_inner_t*)pool->priv)
 
 typedef struct {
 	int flag;

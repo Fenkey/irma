@@ -9,13 +9,14 @@
 /*
  * libmemcached: https://libmemcached.org/
  */
-#define MI			((memcached_inner_t*)s->priv)
-#define KFMT		"c-%s-%s"
-#define __(key)		key = buf_printf(MI->key, KFMT, MI->prefix, key)
-#define K			MI->key->data
-#define KLEN		MI->key->offset
-#define ZIPMIN		1024
-#define ZIPDEF		10240
+#define KFMT	"c-%s-%s"
+#define __(key)	key = buf_printf(MI->key, KFMT, MI->prefix, key)
+#define K		MI->key->data
+#define KLEN	MI->key->offset
+#define ZIPMIN	1024
+#define ZIPDEF	10240
+
+#define MI ((memcached_inner_t*)s->priv)
 
 typedef struct {
 	memcached_st *m;

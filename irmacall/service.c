@@ -24,61 +24,84 @@
 #define SPIRIT_INTERVAL		5
 #define GC_INTERVAL			600
 #define MOCK_HEADER			"HTTP_IRMA_MOCK"
-#define BOOT_READY()		do { \
-							__main_booting = 1; \
-							} while (0)
-#define BOOT_WAIT()			do { \
-							pthread_mutex_lock(&__boot_mutex); \
-							while (__main_booting > 0) \
-							pthread_cond_wait(&__boot_cond, &__boot_mutex); \
-							pthread_mutex_unlock(&__boot_mutex); \
-							} while (0)
-#define BOOT_DONE(v)		do { \
-							pthread_mutex_lock(&__boot_mutex); \
-							__main_booting = v; \
-							pthread_cond_signal(&__boot_cond); \
-							pthread_mutex_unlock(&__boot_mutex); \
-							} while (0)
-#define RELOAD_READY()		do { \
-							__thread_reloaded = 0; \
-							__main_reloading = 1; \
-							} while (0)
-#define RELOAD_FAIL()		do { \
-							__main_reloading = 0; \
-							} while (0)
-#define RELOAD_WAIT()		do { \
-							pthread_mutex_lock(&__reload_mutex); \
-							while (__main_reloading > 0) \
-							pthread_cond_wait(&__reload_cond, &__reload_mutex); \
-							pthread_mutex_unlock(&__reload_mutex); \
-							} while (0)
-#define RELOAD_DONE()		do { \
-							pthread_mutex_lock(&__reload_mutex); \
-							__main_reloading = 0; \
-							pthread_cond_signal(&__reload_cond); \
-							pthread_mutex_unlock(&__reload_mutex); \
-							} while (0)
-#define RELOAD_COUNT()		do { \
-							pthread_mutex_lock(&__reload_count_mutex); \
-							__thread_reloaded++; \
-							pthread_mutex_unlock(&__reload_count_mutex); \
-							} while (0)
-#define EXIT_COUNT()		do { \
-							pthread_mutex_lock(&__exit_count_mutex); \
-							__thread_exited++; \
-							pthread_mutex_unlock(&__exit_count_mutex); \
-							} while (0)
-#define REPORT_URL()		do { \
-							pthread_mutex_lock(&__report_mutex); \
-							spirit_report(&report_url); \
-							pthread_mutex_unlock(&__report_mutex); \
-							} while (0)
-#define REPORT_CONSOLE()	do { \
-							pthread_mutex_lock(&__report_mutex); \
-							spirit_report(&report_console); \
-							pthread_mutex_unlock(&__report_mutex); \
-							} while (0)
-#define WI					((worker_inner_t*)(w->priv_sys))
+
+#define BOOT_READY() \
+do { \
+	__main_booting = 1; \
+} while (0)
+
+#define BOOT_WAIT() \
+do { \
+	pthread_mutex_lock(&__boot_mutex); \
+	while (__main_booting > 0) \
+	pthread_cond_wait(&__boot_cond, &__boot_mutex); \
+	pthread_mutex_unlock(&__boot_mutex); \
+} while (0)
+
+#define BOOT_DONE(v) \
+do { \
+	pthread_mutex_lock(&__boot_mutex); \
+	__main_booting = v; \
+	pthread_cond_signal(&__boot_cond); \
+	pthread_mutex_unlock(&__boot_mutex); \
+} while (0)
+
+#define RELOAD_READY() \
+do { \
+	__thread_reloaded = 0; \
+	__main_reloading = 1; \
+} while (0)
+
+#define RELOAD_FAIL() \
+do { \
+	__main_reloading = 0; \
+} while (0)
+
+#define RELOAD_WAIT() \
+do { \
+	pthread_mutex_lock(&__reload_mutex); \
+	while (__main_reloading > 0) \
+	pthread_cond_wait(&__reload_cond, &__reload_mutex); \
+	pthread_mutex_unlock(&__reload_mutex); \
+} while (0)
+
+#define RELOAD_DONE() \
+do { \
+	pthread_mutex_lock(&__reload_mutex); \
+	__main_reloading = 0; \
+	pthread_cond_signal(&__reload_cond); \
+	pthread_mutex_unlock(&__reload_mutex); \
+} while (0)
+
+#define RELOAD_COUNT() \
+do { \
+	pthread_mutex_lock(&__reload_count_mutex); \
+	__thread_reloaded++; \
+	pthread_mutex_unlock(&__reload_count_mutex); \
+} while (0)
+
+#define EXIT_COUNT() \
+do { \
+	pthread_mutex_lock(&__exit_count_mutex); \
+	__thread_exited++; \
+	pthread_mutex_unlock(&__exit_count_mutex); \
+} while (0)
+
+#define REPORT_URL() \
+do { \
+	pthread_mutex_lock(&__report_mutex); \
+	spirit_report(&report_url); \
+	pthread_mutex_unlock(&__report_mutex); \
+} while (0)
+
+#define REPORT_CONSOLE() \
+do { \
+	pthread_mutex_lock(&__report_mutex); \
+	spirit_report(&report_console); \
+	pthread_mutex_unlock(&__report_mutex); \
+} while (0)
+
+#define WI ((worker_inner_t*)(w->priv_sys))
 
 typedef struct __rescode rescode_t;
 static struct __rescode {

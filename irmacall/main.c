@@ -2,7 +2,7 @@
 #include "../config.h"
 #include "service.h"
 
-#define VERSION	"0.8"
+#define VERSION "0.8"
 
 extern sopt_t mono_sopt;
 

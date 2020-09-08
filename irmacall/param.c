@@ -6,8 +6,8 @@
 #include "list.h"
 #include "param.h"
 
-#define PLI	((paramlist_inner_t*)plist->priv)
-#define PPI	((paramparser_inner_t*)parser->priv)
+#define PLI ((paramlist_inner_t*)plist->priv)
+#define PPI ((paramparser_inner_t*)parser->priv)
 
 typedef struct {
 	int local;
@@ -70,7 +70,7 @@ static void paramlist_reset(paramlist_t *plist)
 	buf_reset(PLI->buf);
 }
 
-static void	paramlist_print(paramlist_t *plist, param_print_t pf, buf_t *buf)
+static void paramlist_print(paramlist_t *plist, param_print_t pf, buf_t *buf)
 {
 	assert(plist && pf);
 	struct pfpack pack = { pf, buf };

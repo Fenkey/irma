@@ -8,7 +8,6 @@
 /*
  * redis: http://doc.redisfans.com/
  */
-#define RI		((redis_inner_t*)s->priv)
 #define CXT		reset(s)
 #define KFMT	"c-%s-%s"
 #define __(key)	key = buf_printf(RI->key, KFMT, RI->prefix, key)
@@ -16,6 +15,8 @@
 #define KLEN	RI->key->offset
 #define EXP		(exp == 0 ? 8640000 : exp)
 #define LTMAX	2
+
+#define RI ((redis_inner_t*)s->priv)
 
 typedef struct {
 	redisContext *context;
