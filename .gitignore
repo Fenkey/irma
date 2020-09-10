@@ -26,6 +26,11 @@ core
 *.out
 *.exe
 *.pdb
+*.tmp
+*.svn
 *.dylib
 *.sock
 *.tar.gz
+*.suo
+*.vscode
+*.vcproj

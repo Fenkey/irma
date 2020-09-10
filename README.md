@@ -66,7 +66,7 @@ The source links of above packages as below:
 * `memcached`: <a src="https://libmemcached.org/">https://libmemcached.org/</a>
 * `hiredis`: <a src="https://github.com/redis/hiredis.git">https://github.com/redis/hiredis.git</a>
 
-> Note to add SSL support (`--with-ssl`) when you compile libcurl. Because libcurl does not support the DNS asynchronous resolusion, you have to utilize the way of `signal`, or the third part package of `c-ares` that is the official recommendation of libcurl. We follow the advice to use `c-ares`:
+> Note to add SSL support (`--with-ssl`) when you compile libcurl. Because libcurl does not support the DNS asynchronous resolusion, you have to utilize the way of `signal`, or the third party package of `c-ares` that is the official recommendation of libcurl. We follow the advice to use `c-ares`:
 
 ```bash
 $ ./configure --prefix=$HOME/local/c-ares --enable-static
