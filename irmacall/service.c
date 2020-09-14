@@ -781,7 +781,7 @@ static int request_mock_parse(worker_t *w)
 			return -1;
 		if (WI->req_body->offset - len > WI->bmax) {
 			buf_force_reset(WI->req_body);
-			goto __reject;
+			goto __413;
 		}
 		WI->req_body->data = memmove(p, p + len, WI->req_body->offset - len);
 		WI->req_body->offset -= len;
@@ -789,7 +789,7 @@ static int request_mock_parse(worker_t *w)
 	DEBUG(w->log, "Core - Mock request found");
 	return 0;
 
-__reject:
+__413:
 	/*
 	 * A request with big size body can be received just when the size is under
 	 * the both limit of 'client_max_body_size' in nginx and bmax in irma.
@@ -807,25 +807,31 @@ static int request_basic_parse(worker_t *w)
 	if (!(WI->request_uri = FCGX_GetParam("REQUEST_URI", envp)))
 		return -1;
 	if (!strcasecmp(WI->method, "POST") || !strcasecmp(WI->method, "PUT")) {
+		int n, len = 0, size = sizeof(WI->cbuf);
 		char *p = FCGX_GetParam("CONTENT_LENGTH", envp);
-		if (p && atol(p) > WI->bmax)
-			goto __reject;
-
-		int n, size = sizeof(WI->cbuf);
+		if (p && (len = atoi(p)) > WI->bmax)
+			goto __413;
+		if (len > 0)
+			buf_data(WI->req_body, len);
+		/*
+		 * We ignore the case of len <= 0 and try to extract the body according
+		 * to the actual situation. However, if the len is effective, we would
+		 * compare whether the actual length is consistent eventually.
+		 */
 		do {
 			if ((n = FCGX_GetStr(WI->cbuf, size, WI->req.in)) > 0) {
 				if (WI->req_body->offset + n > WI->bmax) {
 					buf_force_reset(WI->req_body);
-					goto __reject;
+					goto __413;
 				}
 				buf_append(WI->req_body, WI->cbuf, n);
 			}
 		} while (n >= size);
-
-		/* It's up to the higher irmakit.
-		if (WI->req_body->offset <= 0)
-			return -1;
-		*/
+		if (WI->req_body->offset <= 0) {
+			/* It's up to the higher irmakit. */
+			// return -1;
+		} else if (len > 0 && WI->req_body->offset != len)
+			goto __400;
 	}
 	WI->query_string = FCGX_GetParam("QUERY_STRING", envp);
 	WI->content_type = FCGX_GetParam("CONTENT_TYPE", envp);
@@ -843,7 +849,12 @@ static int request_basic_parse(worker_t *w)
 		return -1;
 	return 0;
 
-__reject:
+__400:
+	w->send_http(w, 400, NULL);
+	WARN(w->log, "Core - Bad request, of which the 'Content-Length' is wrong");
+	return -1;
+
+__413:
 	/*
 	 * A request with big size body can be received just when the size is under
 	 * the both limit of 'client_max_body_size' in nginx and bmax in irma.

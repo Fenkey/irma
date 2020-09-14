@@ -9,3 +9,4 @@
 Makefile	text eol=lf
 *.jpg		-text
 *.dll		-text
+*.cs		linguist-language=C

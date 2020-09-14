@@ -34,6 +34,7 @@ namespace ${appName}.Web
                     d["success"] = true;
                 json = JsonConvert.SerializeObject(d, Settings);
             }
+            context.Response.ContentType = "application/json";
             context.Response.Echo(json);
         }
     }

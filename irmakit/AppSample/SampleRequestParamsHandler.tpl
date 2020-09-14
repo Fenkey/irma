@@ -30,6 +30,7 @@ namespace ${appName}.Web
 			res.BufferAppend(string.Format("HttpMethod: {0}<br/>", req.HttpMethod));
 			res.BufferAppend(string.Format("QueryString: {0}<br/>", req.QueryString));
 			res.BufferAppend(string.Format("ContentType: {0}<br/>", req.ContentType));
+			res.BufferAppend(string.Format("ContentLength: {0}<br/>", req.ContentLength));
 			res.BufferAppend(string.Format("Accept: {0}<br/>", req.Accept));
 			res.BufferAppend(string.Format("AcceptLanguage: {0}<br/>", req.AcceptLanguage));
 			res.BufferAppend(string.Format("AcceptEncoding: {0}<br/>", req.AcceptEncoding));
