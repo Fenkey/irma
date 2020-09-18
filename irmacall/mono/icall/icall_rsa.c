@@ -75,13 +75,7 @@ static MonoString* __decrypt(MonoString *keyfile, MonoString *keypwd, MonoArray 
 	}
 	mono_free(k);
 
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(content, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(content, len, app->buf);
 
 	buf_t *dec = w->pool->lend(w->pool, 0, 0);
 	if (rsa_decrypt(rsa, app->buf->data, app->buf->offset, dec) > 0)
@@ -206,15 +200,7 @@ static MonoBoolean verify(int type, MonoString *keyfile, MonoString *keypwd, Mon
 		mono_free(c);
 		return 0;
 	}
-
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(sign, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
-
+	mono_array_copy(sign, len, app->buf);
 	int ret = rsa_verify(rsa, type, c, strlen(c), app->buf->data, app->buf->offset);
 	//buf_force_reset(app->buf);
 	mono_free(c);
@@ -286,13 +272,7 @@ static MonoString* mem_decrypt(MonoString *key, MonoString *keypwd, MonoArray *c
 	}
 	mono_free(k);
 
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(content, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(content, len, app->buf);
 
 	buf_t *dec = w->pool->lend(w->pool, 0, 0);
 	if (rsa_decrypt(rsa, app->buf->data, app->buf->offset, dec) > 0)
@@ -410,15 +390,7 @@ static MonoBoolean mem_verify(int type, MonoString *key, MonoString *keypwd, Mon
 		rsa_free(rsa);
 		return 0;
 	}
-
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(sign, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
-
+	mono_array_copy(sign, len, app->buf);
 	int ret = rsa_verify(rsa, type, c, strlen(c), app->buf->data, app->buf->offset);
 	//buf_force_reset(app->buf);
 	mono_free(c);

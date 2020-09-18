@@ -1,6 +1,6 @@
 # IRMA
 
-IRMA, which originated from a business project and it was created because of the comprehensive reasons such as the requirement of .Net for the enterprise, SaaS & cloud deployment and Linux running environment etc. Essentially the IRMA is an efficient web service framework and it's built base on the Mono and the FastCGI. It uses Mono to implement the parsing and execution of C# code on Linux, and utilizes the FastCGI and Nginx to deal with the HTTP interaction. There are two parts in IRMA: `irmacall`, a multithreading scheduling engine implemented by C, and `irmakit`, a framework implemented by C#. The design concept of IRMA is: ***Simple and efficient scheduling, on-demand integration and expansion***, which really makes the IRMA look more like a toolset than a framework (In fact, it is a toolset). Anyway, I hope it's useful for you :-)
+IRMA, an efficient web service framework, which originated from a business project and was created because of the comprehensive reasons such as the requirement of .Net for the enterprise, SaaS & cloud automated deployment and Linux running environment etc. IRMA is built base on the Mono and the FastCGI. It uses Mono to implement the parsing and execution of C# code on Linux, and utilizes the FastCGI and Nginx to deal with the HTTP interaction. There are two parts of IRMA: `irmacall`, a multithreading scheduling engine written in C, and `irmakit`, a development framework written in C#. `irmacall` is responsible for launching & scheduling all kinds of web applications developed base on `irmakit` framework. The design concept of IRMA is: ***Simple and efficient scheduling, on-demand integration and expansion***, which really makes the IRMA look more like a toolset than a framework (In fact, it is a toolset). Anyway, I hope it's useful for you :-)
 
 ## Compilation & Installation
 
@@ -10,7 +10,7 @@ Configure it at first:
 $ make config
 ```
 
-Here I assume that you have installed the relevant libraries on `$HOME/local/`, so the configuration process will be roughly as follows:
+Here I assume that you have installed the relevant libraries on `$HOME/local/` (You might type the corrent path according to your actual situation), so the configuration process will be roughly as follows:
 
 ```bash
 ########################################
@@ -56,7 +56,7 @@ The irma is now hopefully configured for your setup.
 Check the config.in & config.h files and do 'make' to build it.
 ```
 
-The source links of above packages as below:
+The source links of above packages might refer as below:
 
 * `mono`: <a src="https://github.com/mono/mono.git">https://github.com/mono/mono.git</a>
 * `openssl`: <a src="https://github.com/openssl/openssl.git">https://github.com/openssl/openssl.git</a>
@@ -132,7 +132,7 @@ Features: fetcher fuse c_ares memcached redis smtp
 
 ## Quick Start
 
-Create and launch the first project named `Foo`:
+Create and launch the first project named `Foo` easily:
 
 ```bash
 $ cd ~/tmp
@@ -181,7 +181,7 @@ $ cat Bin/Debug/log/fatal/irma_20200903.log
 [14:46:15,554132|032126|7f4d19fa7700] Core - Raise exception while invoking application ! Check it pls
 ```
 
-If there is any other reason, refer to [FAQ](./docs/FAQ.zh-CN.md) please. If success, the `log` file will be generated:
+If there are any other reasons, refer to [FAQ](./docs/FAQ.zh-CN.md) please. If success, the `log` files will be generated:
 
 ```bash
 $ cat Bin/Debug/log/event/irma_20200903.log

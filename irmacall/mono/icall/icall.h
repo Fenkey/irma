@@ -35,22 +35,35 @@ typedef struct {
 	MonoObject	*obj_global;	/* irmakit 安全的线程内静态化全局对象 */
 	int			handle_locked;	/* 进入框架层Handle()之前是否已lock */
 
-	int			(*init)(worker_t *w);
-	int			(*handle)(worker_t *w);
-	int			(*reload)(worker_t *w);
-	void		(*keepalive)(worker_t *w);
-	void		(*finalize)(worker_t *w);
-	void		(*handle_unlock)(worker_t *w);
+	int		(*init)(worker_t *w);
+	int		(*handle)(worker_t *w);
+	int		(*reload)(worker_t *w);
+	void	(*keepalive)(worker_t *w);
+	void	(*finalize)(worker_t *w);
+	void	(*handle_unlock)(worker_t *w);
 } app_t;
+
+#define mono_array_copy_b(array,alen,buf,blen) \
+do { \
+	int i = 0; \
+	buf_data_reset(buf, blen); \
+	for (; i < alen; i++) \
+		(buf)->data[i] = mono_array_get(array, unsigned char, i); \
+	(buf)->offset = alen; \
+	(buf)->data[alen] = 0; \
+} while (0);
+
+#define mono_array_copy(array,len,buf) \
+mono_array_copy_b(array,len,buf,len)
 
 typedef struct {
 	const char	*i_name;
 	const void	*i_method;
 } icall_item_t;
 
-#define ICALL_ITEM(n, m)		{"IRMACore.Lower.ICall::"#n, (const void*)&(m)}
-#define ICALL_ITEM_NULL			{NULL, NULL}
-#define regit(items)			do { icall_item_t *p = items; for (; p && p->i_name; p++) mono_add_internal_call(p->i_name, p->i_method); } while (0)
+#define ICALL_ITEM(n,m)	{"IRMACore.Lower.ICall::"#n, (const void*)&(m)}
+#define ICALL_ITEM_NULL	{NULL, NULL}
+#define regit(items)	do { icall_item_t *p = items; for (; p && p->i_name; p++) mono_add_internal_call(p->i_name, p->i_method); } while (0)
 
 void register_icall();
 

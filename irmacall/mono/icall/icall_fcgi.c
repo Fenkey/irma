@@ -296,13 +296,7 @@ static void __send(MonoArray *content)
 		return;
 	worker_t *w = CURRENT;
 	app_t *app = (app_t*)w->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(content, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(content, len, app->buf);
 	w->send(w, app->buf);
 }
 
@@ -314,13 +308,7 @@ static void send_http(int rescode, MonoArray *content)
 		int len = mono_array_length(content);
 		if (len > 0) {
 			app_t *app = (app_t*)w->priv_app;
-			buf_data_reset(app->buf, len);
-			int i = 0;
-			unsigned char uc;
-			for (; i < len; i++) {
-				uc = mono_array_get(content, unsigned char, i);
-				buf_append(app->buf, (const char*)&uc, 1);
-			}
+			mono_array_copy(content, len, app->buf);
 			buf = app->buf;
 		}
 	}
@@ -334,13 +322,7 @@ static void echo(MonoArray *content)
 		if (len > 0) {
 			worker_t *w = CURRENT;
 			app_t *app = (app_t*)w->priv_app;
-			buf_data_reset(app->buf, len);
-			int i = 0;
-			unsigned char uc;
-			for (; i < len; i++) {
-				uc = mono_array_get(content, unsigned char, i);
-				buf_append(app->buf, (const char*)&uc, 1);
-			}
+			mono_array_copy(content, len, app->buf);
 			w->echo(w, app->buf);
 		}
 	}

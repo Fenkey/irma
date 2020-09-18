@@ -104,13 +104,7 @@ static MonoBoolean setnx(long L, MonoString *key, MonoArray *val, long exp)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->setnx(s, k, app->buf->data, app->buf->offset, EXP);
 	mono_free(k);
 	return ret;
@@ -130,13 +124,7 @@ static MonoBoolean setex(long L, MonoString *key, MonoArray *val, long exp)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->setex(s, k, app->buf->data, app->buf->offset, EXP);
 	mono_free(k);
 	return ret;
@@ -156,13 +144,7 @@ static MonoBoolean set(long L, MonoString *key, MonoArray *val, long exp)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->set(s, k, app->buf->data, app->buf->offset, EXP);
 	mono_free(k);
 	return ret;
@@ -251,13 +233,7 @@ static MonoBoolean add(long L, MonoString *key, MonoArray *val, long exp)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->add(s, k, app->buf->data, app->buf->offset, EXP);
 	mono_free(k);
 	return ret;
@@ -277,13 +253,7 @@ static MonoBoolean replace(long L, MonoString *key, MonoArray *val, long exp)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->replace(s, k, app->buf->data, app->buf->offset, EXP);
 	mono_free(k);
 	return ret;
@@ -303,13 +273,7 @@ static MonoBoolean prepend(long L, MonoString *key, MonoArray *val)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->prepend(s, k, app->buf->data, app->buf->offset);
 	mono_free(k);
 	return ret;
@@ -329,13 +293,7 @@ static MonoBoolean append(long L, MonoString *key, MonoArray *val)
 		return 0;
 	}
 	app_t *app = (app_t*)CURRENT->priv_app;
-	buf_data_reset(app->buf, len);
-	int i = 0;
-	unsigned char uc;
-	for (; i < len; i++) {
-		uc = mono_array_get(val, unsigned char, i);
-		buf_append(app->buf, (const char*)&uc, 1);
-	}
+	mono_array_copy(val, len, app->buf);
 	int ret = s->append(s, k, app->buf->data, app->buf->offset);
 	mono_free(k);
 	return ret;

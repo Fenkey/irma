@@ -340,8 +340,6 @@ static void app_free(worker_t *w, int finalize)
 static const char* check_rescode(int code)
 {
 	static const char *desc = "Unassigned";
-	if (code < 100 || code > 511)
-		return desc;
 	static int inx[] = { -1, 0, 4, 14, 22, 50 };
 	rescode_t *p = &__codelist[inx[code/100]];
 	do {
@@ -826,7 +824,8 @@ static int request_basic_parse(worker_t *w)
 				}
 				buf_append(WI->req_body, WI->cbuf, n);
 			}
-		} while (n >= size);
+		} while (n >= size)
+			;
 		if (WI->req_body->offset <= 0) {
 			/* It's up to the higher irmakit. */
 			// return -1;
@@ -1279,6 +1278,8 @@ static int __send_http(worker_t *w, int rescode, const char *desc, buf_t *conten
 
 static int send_http(worker_t *w, int rescode, buf_t *content)
 {
+	if (rescode < 100 || rescode > 511)
+		return -1;
 	return __send_http(w, rescode, check_rescode(rescode), content);
 }
 

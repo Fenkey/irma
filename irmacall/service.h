@@ -97,7 +97,7 @@ extern log_t *g_log;
 extern buf_pool_t *g_buf_pool;
 
 /* API */
-#define CURRENT	worker_self()
+#define CURRENT worker_self()
 int service_run(int argc, char *argv[], service_t *s);
 worker_t* worker_self();
 
