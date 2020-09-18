@@ -10,6 +10,11 @@
 > 总的来说，考虑好需求和定位，先设计再编码
 
 
+**`[Q]` - 关于IRMA的tag版本**
+
+> 因为IRMA由`irmacall`及`irmakit`两部分构成，理论上可以有各自独立的版本发展，故采用组合方式体现整体版本：`v<irmacall_version>-<irmakit_version>`，例如：`v0.8-1.0.0`
+
+
 **`[Q]` - 关于`conf`配置**
 
 > * 采用`irma-genapp`生成项目时，默认采用`conf/<project-name>.conf`方式命名项目配置文件（例如`conf/Foo.conf`）。也修改为任何你所喜欢的名称，只是要留意同时修改一下启动文件`start.sh`内`config`配置，例如：
@@ -94,6 +99,17 @@ Bin/Debug/log
 ```
 
 > `log`文件内按行输出，每行规格为`[hh:mm:ss,ms|pid|threadid] [Core|Kit|] - ...`
+
+
+**`[Q]` -  `irma_genapp`自动生成项目中相关脚本的作用 ？**
+
+> Script | 作用
+> ---- | ----
+> start.sh | 启动相关配置（进程数量、每个进程的线程数量、日志级别、conf文件等）
+> stop.sh | 停止正在运行的应用
+> reload.sh | 重启正在运行的应用（例如修改conf情况下。如果代码修改则必须重编译后start.sh）
+> runtime.sh | 临时以debug日志方式输出并查看各进程运行状况数据（即使启动时采用了高于debug的日志级别）
+> xlogbase.sh | 临时切换到debug日志输出方式（例如生产环境以event日志级别启动，但希望临时切换到debug；再次执行xlogbase.sh将回到启动时log级别、或IRMA将在1小时后自动切换回到启动时log级别）
 
 
 **`[Q]` - 关于`context`、及`Handler`之外如何引用`context` ？**

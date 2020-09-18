@@ -91,7 +91,7 @@ $ make
 $ make install
 ```
 
-默认安装地址为：`$HOME/local/irma`，修改请编辑`irma/Makefile`文件内配置：
+一般情况下，我们按静态化方式编译IRMA，以便于最小化依赖方式可部署运行（可直接修改Makefile以采用动态链接库方式）。默认安装地址为：`$HOME/local/irma`，修改请编辑`irma/Makefile`文件内配置：
 
 ```bash
 PREFIX = $(HOME)/local/irma

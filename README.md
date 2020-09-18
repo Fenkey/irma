@@ -10,7 +10,7 @@ Configure it at first:
 $ make config
 ```
 
-Here I assume that you have installed the relevant libraries on `$HOME/local/` (You might type the corrent path according to your actual situation), so the configuration process will be roughly as follows:
+Here I assume that you have installed the relevant libraries on `$HOME/local/` (You might type the correct path according to your actual situation), so the configuration process will be roughly as follows:
 
 ```bash
 ########################################
@@ -91,7 +91,7 @@ $ make
 $ make install
 ```
 
-We assume the installation path is `$HOME/local/irma` and modify the file `irma/Makefile`:
+By default we compile IRMA statically and it means that you can apply & run it in the least dependant way. You might change it by modifying the Makefile directly. We assume the installation path is `$HOME/local/irma` and modify the file `irma/Makefile`:
 
 ```bash
 PREFIX = $(HOME)/local/irma
