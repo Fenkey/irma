@@ -65,7 +65,7 @@ static int append_formpost_filebuf(MonoString *name, MonoString *file, MonoArray
 
 	int len = body ? mono_array_length(body) : 0;
 	if (len > 0)
-		mono_array_copy(body, len, app->buf);
+		mono_array_in(body, len, app->buf);
 	int ret = f->append_formpost_filebuf(f, n, pf, app->buf->data, app->buf->offset, ct);
 	buf_force_reset(app->buf);
 	if (n) mono_free(n);
@@ -107,7 +107,7 @@ static long post(MonoString *url, MonoArray *body, int timeout)
 		return -1;
 	int len = body ? mono_array_length(body) : 0;
 	if (len > 0)
-		mono_array_copy(body, len, app->buf);
+		mono_array_in(body, len, app->buf);
 	long code = f->post(f, u, app->buf->data, app->buf->offset, timeout);
 	//buf_force_reset(app->buf);
 	mono_free(u);
@@ -139,7 +139,7 @@ static long put(MonoString *url, MonoArray *body, int timeout)
 		return -1;
 	int len = body ? mono_array_length(body) : 0;
 	if (len > 0)
-		mono_array_copy(body, len, app->buf);
+		mono_array_in(body, len, app->buf);
 	long code = f->put(f, u, app->buf->data, app->buf->offset, timeout);
 	//buf_force_reset(app->buf);
 	mono_free(u);
@@ -167,9 +167,7 @@ static MonoArray* res_body()
 	fetcher_t *f = app->fetcher;
 
 	MonoArray *body = mono_array_new(app->domain, mono_get_byte_class(), f->res_body->offset);
-	int i = 0;
-	for (; i < f->res_body->offset; i++)
-		mono_array_set(body, unsigned char, i, ((unsigned char*)f->res_body->data)[i]);
+	mono_array_out_b(body, f->res_body);
 	return body;
 }
 

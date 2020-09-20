@@ -143,9 +143,7 @@ static MonoArray* get_request_get_param(int index, MonoString **param_name)
 	if (p && v) {
 		*param_name = mono_string_new(app->domain, p);
 		param_value = mono_array_new(app->domain, mono_get_byte_class(), vlen);
-		int i = 0;
-		for (; i < vlen; i++)
-			mono_array_set(param_value, unsigned char, i, ((unsigned char*)v)[i]);
+		mono_array_out(param_value, v, vlen);
 	} else {
 __empty:
 		*param_name = NULL;
@@ -178,9 +176,7 @@ static MonoArray* get_request_post_param(int index, MonoString **param_name)
 	if (p && v) {
 		*param_name = mono_string_new(app->domain, p);
 		param_value = mono_array_new(app->domain, mono_get_byte_class(), vlen);
-		int i = 0;
-		for (; i < vlen; i++)
-			mono_array_set(param_value, unsigned char, i, ((unsigned char*)v)[i]);
+		mono_array_out(param_value, v, vlen);
 	} else {
 __empty:
 		*param_name = NULL;
@@ -213,9 +209,7 @@ static MonoArray* get_request_file_param(int index, MonoString **param_name, Mon
 		*file_name = mono_string_new(app->domain, fname);
 		*content_type = mono_string_new(app->domain, ctype);
 		param_value = mono_array_new(app->domain, mono_get_byte_class(), vlen);
-		int i = 0;
-		for (; i < vlen; i++)
-			mono_array_set(param_value, unsigned char, i, ((unsigned char*)v)[i]);
+		mono_array_out(param_value, v, vlen);
 	} else {
 __empty:
 		*param_name = NULL;
@@ -235,9 +229,7 @@ static MonoArray* get_request_body()
 	const char *p = w->request_body(w, &blen, NULL);
 	if (p && blen > 0) {
 		body = mono_array_new(app->domain, mono_get_byte_class(), blen);
-		int i = 0;
-		for (; i < blen; i++)
-			mono_array_set(body, unsigned char, i, ((unsigned char*)p)[i]);
+		mono_array_out(body, p, blen);
 	} else {
 		body = mono_array_new(app->domain, mono_get_byte_class(), 0);
 	}
@@ -253,9 +245,7 @@ static MonoArray* request_dump()
 	buf_t *d = w->request_dump(w);
 	if (d) {
 		dump = mono_array_new(app->domain, mono_get_byte_class(), d->offset);
-		int i = 0;
-		for (; i < d->offset; i++)
-			mono_array_set(dump, unsigned char, i, ((unsigned char*)d->data)[i]);
+		mono_array_out_b(dump, d);
 		buf_force_reset(d);
 		buf_return(d);
 	} else
@@ -296,7 +286,7 @@ static void __send(MonoArray *content)
 		return;
 	worker_t *w = CURRENT;
 	app_t *app = (app_t*)w->priv_app;
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 	w->send(w, app->buf);
 }
 
@@ -308,7 +298,7 @@ static void send_http(int rescode, MonoArray *content)
 		int len = mono_array_length(content);
 		if (len > 0) {
 			app_t *app = (app_t*)w->priv_app;
-			mono_array_copy(content, len, app->buf);
+			mono_array_in(content, len, app->buf);
 			buf = app->buf;
 		}
 	}
@@ -322,7 +312,7 @@ static void echo(MonoArray *content)
 		if (len > 0) {
 			worker_t *w = CURRENT;
 			app_t *app = (app_t*)w->priv_app;
-			mono_array_copy(content, len, app->buf);
+			mono_array_in(content, len, app->buf);
 			w->echo(w, app->buf);
 		}
 	}

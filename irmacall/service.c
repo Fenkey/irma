@@ -221,7 +221,7 @@ typedef struct {
 	list_t *req_mock_param;
 	char **req_mockenvp;
 	int req_ismock;
-	int req_finished;
+	int res_finished;
 	FCGX_Request req;
 	int logsync;
 	int reload_done;
@@ -691,10 +691,7 @@ static void launched(worker_t *w)
 static void once_over(worker_t *w)
 {
 	if (WI->busy > 0) {
-		if (!WI->req_finished) {
-			FCGX_Finish_r(&WI->req);
-			WI->req_finished = 1;
-		}
+		FCGX_Finish_r(&WI->req);
 		if (WI->fuse)
 			fuse_evaluate_out(WI->fuse, WI->req_lasttime, WI->error_times, WI->fatal_times);
 		WI->busy = 0;
@@ -979,10 +976,6 @@ static char** fcgi_params(worker_t *w)
 
 static const char* get_fcgi_param(worker_t *w, const char *param_name)
 {
-	if (WI->req_finished) {
-		WARN(w->log, "Core - Get '%s' from request that has been invalid after responsed", param_name);
-		return NULL;
-	}
 	return FCGX_GetParam(param_name, __envp(w));
 }
 
@@ -1212,11 +1205,11 @@ static int fcgi_send(const char *data, int len, worker_t *w)
 	 * Response now but it will not affect the remaining work in handle.
 	 * Note the following response actions will be discarded.
 	 */
-	if (WI->req_finished)
+	if (WI->res_finished)
 		return 0;
 	int n = FCGX_PutStr(data, len, WI->req.out);
-	FCGX_Finish_r(&WI->req);
-	WI->req_finished = 1;
+	FCGX_FFlush(WI->req.out);
+	WI->res_finished = 1;
 	if (++WI->res_times < 0)
 		WI->res_times = 1;
 	return n;
@@ -1366,7 +1359,7 @@ static void worker_reset(worker_t *w)
 		WI->req_mockenvp = NULL;
 		WI->req_ismock = 0;
 	}
-	WI->req_finished = 0;
+	WI->res_finished = 0;
 	WI->fuse = NULL;
 	w->pool->reset(w->pool);
 }

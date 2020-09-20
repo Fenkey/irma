@@ -37,7 +37,7 @@ static MonoArray* __ecb_encrypt(MonoString *key, MonoArray *content, int ptype)
 	int plen = des_plen(ptype, &nlen);
 	//DEBUG(w->log, "Des ecb encrypte: len=%d, plen==%d, nlen=%d", len, plen, nlen);
 
-	mono_array_copy_b(content, len, app->buf, nlen);
+	mono_array_in_b(content, len, app->buf, nlen);
 	if (plen > 0) {
 		memset(app->buf->data + len, ptype ? plen : 0, plen);
 		app->buf->offset = nlen;
@@ -51,8 +51,7 @@ static MonoArray* __ecb_encrypt(MonoString *key, MonoArray *content, int ptype)
 		wdes_ecb_encrypt(dk, app->buf->data + i, output->data + i);
 
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), output->offset);
-	for (i = 0; i < output->offset; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)output->data)[i]);
+	mono_array_out_b(ret, output);
 	buf_force_reset(output);
 	buf_return(output);
 	return ret;
@@ -85,7 +84,7 @@ static MonoArray* __ecb_decrypt(MonoString *key, MonoArray *content, int ptype)
 	}
 	mono_free(k);
 
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	int i = 0;
 	char *dec = xcalloc(len, sizeof(char));
@@ -102,8 +101,7 @@ static MonoArray* __ecb_decrypt(MonoString *key, MonoArray *content, int ptype)
 	/* In typical cases, len may be <=0 */
 	if (len > 0) {
 		ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-		for (i = 0; i < len; i++)
-			mono_array_set(ret, unsigned char, i, ((unsigned char*)dec)[i]);
+		mono_array_out(ret, dec, len);
 	}
 	free(dec);
 	//buf_force_reset(app->buf);
@@ -154,7 +152,7 @@ static MonoArray* __cbc_encrypt(MonoString *key, MonoString *iv, MonoArray *cont
 	int plen = des_plen(ptype, &nlen);
 	//DEBUG(w->log, "Des cbc encrypte: len=%d, plen==%d, nlen=%d", len, plen, nlen);
 
-	mono_array_copy_b(content, len, app->buf, nlen);
+	mono_array_in_b(content, len, app->buf, nlen);
 	if (plen > 0) {
 		memset(app->buf->data + len, ptype ? plen : 0, plen);
 		app->buf->offset = nlen;
@@ -166,10 +164,8 @@ static MonoArray* __cbc_encrypt(MonoString *key, MonoString *iv, MonoArray *cont
 	wdes_cbc_encrypt(dk, v, app->buf->data, app->buf->offset, output->data);
 	mono_free(v);
 
-	int i = 0;
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), output->offset);
-	for (; i < output->offset; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)output->data)[i]);
+	mono_array_out_b(ret, output);
 	buf_force_reset(output);
 	buf_return(output);
 	return ret;
@@ -210,7 +206,7 @@ static MonoArray* __cbc_decrypt(MonoString *key, MonoString *iv, MonoArray *cont
 	}
 	mono_free(k);
 
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	char *dec = xcalloc(len, sizeof(char));
 	wdes_cbc_decrypt(dk, v, app->buf->data, len, dec);
@@ -225,10 +221,8 @@ static MonoArray* __cbc_decrypt(MonoString *key, MonoString *iv, MonoArray *cont
 	MonoArray *ret = NULL;
 	/* In typical cases, len may be <=0 */
 	if (len > 0) {
-		int i = 0;
 		ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-		for (; i < len; i++)
-			mono_array_set(ret, unsigned char, i, ((unsigned char*)dec)[i]);
+		mono_array_out(ret, dec, len);
 	}
 	free(dec);
 	//buf_force_reset(app->buf);
@@ -279,7 +273,7 @@ static MonoArray* __ncbc_encrypt(MonoString *key, MonoString *iv, MonoArray *con
 	int plen = des_plen(ptype, &nlen);
 	//DEBUG(w->log, "Des ncbc encrypte: len=%d, plen==%d, nlen=%d", len, plen, nlen);
 
-	mono_array_copy_b(content, len, app->buf, nlen);
+	mono_array_in_b(content, len, app->buf, nlen);
 	if (plen > 0) {
 		memset(app->buf->data + len, ptype ? plen : 0, plen);
 		app->buf->offset = nlen;
@@ -291,10 +285,8 @@ static MonoArray* __ncbc_encrypt(MonoString *key, MonoString *iv, MonoArray *con
 	wdes_ncbc_encrypt(dk, v, app->buf->data, app->buf->offset, output->data);
 	mono_free(v);
 
-	int i = 0;
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), output->offset);
-	for (; i < output->offset; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)output->data)[i]);
+	mono_array_out_b(ret, output);
 	buf_force_reset(output);
 	buf_return(output);
 	return ret;
@@ -335,7 +327,7 @@ static MonoArray* __ncbc_decrypt(MonoString *key, MonoString *iv, MonoArray *con
 	}
 	mono_free(k);
 
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	char *dec = xcalloc(len, sizeof(char));
 	wdes_ncbc_decrypt(dk, v, app->buf->data, len, dec);
@@ -350,10 +342,8 @@ static MonoArray* __ncbc_decrypt(MonoString *key, MonoString *iv, MonoArray *con
 	MonoArray *ret = NULL;
 	/* In typical cases, len may be <=0 */
 	if (len > 0) {
-		int i = 0;
 		ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-		for (; i < len; i++)
-			mono_array_set(ret, unsigned char, i, ((unsigned char*)dec)[i]);
+		mono_array_out(ret, dec, len);
 	}
 	free(dec);
 	//buf_force_reset(app->buf);

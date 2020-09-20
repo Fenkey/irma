@@ -8,7 +8,7 @@ static MonoString* __md5(MonoArray *content)
 	int len = mono_array_length(content);
 	if (len <= 0)
 		return mono_string_new(app->domain, "");
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	char output[33];
 	md5(app->buf->data, app->buf->offset, output);

@@ -8,7 +8,7 @@ static MonoString* __sha1(MonoArray *content)
 	int len = mono_array_length(content);
 	if (len <= 0)
 		return mono_string_new(app->domain, "");
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	char output[41];
 	sha1(app->buf->data, app->buf->offset, output);
@@ -24,7 +24,7 @@ static MonoString* __sha256(MonoArray *content)
 	int len = mono_array_length(content);
 	if (len <= 0)
 		return mono_string_new(app->domain, "");
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	char output[65];
 	sha256(app->buf->data, app->buf->offset, output);

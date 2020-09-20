@@ -254,3 +254,32 @@ FooMock/
 > * 以`Visual Stdio IDE`为例，创建网站项目：FooMock（文件->新建->网站->选择Virtual C#模板内ASP.Net空网站）
 > * 进一步导入`Foo`项目到`FooMock`所在当前解决方案、并将实际项目`Foo`内`Foo/Bin/Debug/{Foo.dll,IRMACore-windows.dll,IRMAKit-windows.dll}`三个dll作为引用导入`FooMock`内
 > * 由于VS工具可直接通过端口启动应用（即不需要指定和配置应用名称，例如通过Chrome启动：`http://localhost:<port>`），采用该方式进行DEBUG时，请将`Foo/conf/Foo.conf`文件`system.app_name`设置为空即可（`"app_name": ""`）；若已明确通过`IIS`配置了应用名称，则要求`app_name`与IIS实际配置名称一致
+
+
+**`[Q]` - 如何对一个请求进行捕捉并mock重现 ？**
+
+> 在实际开发或应用中，往往需要对某次/某类请求进行捕捉，并在开发环境内重现当时的请求情形以作准确分析。IRMA内提供了方便的对应处理机制：
+
+> * 加入捕捉代码并将原始请求dump为一个文件：
+
+```bash
+IRequest req = context.Request;
+if (!req.IsMock) {
+	using (FileStream fs = new FileStream("/home/fenkey/tmp/1.dump", FileMode.Create, FileAccess.Write)) {
+		fs.Write(req.ReqDump, 0, req.ReqDump.Length);
+	}
+}
+```
+
+> * 开发环境内修改`start.sh`，启动为支持mock请求（加入'-m'）：
+
+```bash
+irma-launch -d $dll -k $klass -c $config -p $process_count -x $thread_count -t $log_type -m
+```
+
+> * curl指令模拟重现（假设dump的原始请求API为`request_params`）：
+
+```bash
+curl --data-binary "@/home/fenkey/tmp/1.dump" -H"IRMA-MOCK:1" "http://192.168.146.128:8020/Foo/request_params"; echo
+```
+

@@ -35,9 +35,7 @@ static MonoArray* __encrypt(MonoString *keyfile, MonoString *keypwd, MonoString 
 	/* Note the mono_string_length(content) gets unicode length (e.g. "中国" is 2). */
 	int len = rsa_encrypt(rsa, c, strlen(c), enc);
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	int i = 0;
-	for (; i < len; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)enc->data)[i]);
+	mono_array_out(ret, enc->data, len);
 	//buf_force_reset(enc);
 	mono_free(c);
 	return ret;
@@ -75,7 +73,7 @@ static MonoString* __decrypt(MonoString *keyfile, MonoString *keypwd, MonoArray 
 	}
 	mono_free(k);
 
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	buf_t *dec = w->pool->lend(w->pool, 0, 0);
 	if (rsa_decrypt(rsa, app->buf->data, app->buf->offset, dec) > 0)
@@ -140,9 +138,7 @@ static MonoArray* sign(int type, MonoString *keyfile, MonoString *keypwd, MonoSt
 	memset(sign, 0, sizeof(sign));
 	int len = rsa_sign(rsa, type, c, strlen(c), sign);
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	int i = 0;
-	for (; i < len; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)sign)[i]);
+	mono_array_out(ret, sign, len);
 	mono_free(c);
 	return ret;
 }
@@ -200,7 +196,7 @@ static MonoBoolean verify(int type, MonoString *keyfile, MonoString *keypwd, Mon
 		mono_free(c);
 		return 0;
 	}
-	mono_array_copy(sign, len, app->buf);
+	mono_array_in(sign, len, app->buf);
 	int ret = rsa_verify(rsa, type, c, strlen(c), app->buf->data, app->buf->offset);
 	//buf_force_reset(app->buf);
 	mono_free(c);
@@ -236,9 +232,7 @@ static MonoArray* mem_encrypt(MonoString *key, MonoString *keypwd, MonoString *c
 	buf_t *enc = app->buf;
 	int len = rsa_encrypt(rsa, c, strlen(c), enc);
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	int i = 0;
-	for (; i < len; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)enc->data)[i]);
+	mono_array_out(ret, enc->data, len);
 	//buf_force_reset(enc);
 	mono_free(c);
 	rsa_free(rsa);
@@ -272,7 +266,7 @@ static MonoString* mem_decrypt(MonoString *key, MonoString *keypwd, MonoArray *c
 	}
 	mono_free(k);
 
-	mono_array_copy(content, len, app->buf);
+	mono_array_in(content, len, app->buf);
 
 	buf_t *dec = w->pool->lend(w->pool, 0, 0);
 	if (rsa_decrypt(rsa, app->buf->data, app->buf->offset, dec) > 0)
@@ -333,9 +327,7 @@ static MonoArray* mem_sign(int type, MonoString *key, MonoString *keypwd, MonoSt
 	memset(sign, 0, sizeof(sign));
 	int len = rsa_sign(rsa, type, c, strlen(c), sign);
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	int i = 0;
-	for (; i < len; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)sign)[i]);
+	mono_array_out(ret, sign, len);
 	mono_free(c);
 	rsa_free(rsa);
 	return ret;
@@ -390,7 +382,7 @@ static MonoBoolean mem_verify(int type, MonoString *key, MonoString *keypwd, Mon
 		rsa_free(rsa);
 		return 0;
 	}
-	mono_array_copy(sign, len, app->buf);
+	mono_array_in(sign, len, app->buf);
 	int ret = rsa_verify(rsa, type, c, strlen(c), app->buf->data, app->buf->offset);
 	//buf_force_reset(app->buf);
 	mono_free(c);

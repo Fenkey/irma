@@ -43,18 +43,25 @@ typedef struct {
 	void	(*handle_unlock)(worker_t *w);
 } app_t;
 
-#define mono_array_copy_b(array,alen,buf,blen) \
+#define mono_array_in_b(array,alen,buf,blen) \
 do { \
-	int i = 0; \
 	buf_data_reset(buf, blen); \
-	for (; i < alen; i++) \
-		(buf)->data[i] = mono_array_get(array, unsigned char, i); \
+	memcpy((buf)->data, mono_array_addr(array, unsigned char, 0), alen); \
 	(buf)->offset = alen; \
 	(buf)->data[alen] = 0; \
-} while (0);
+} while (0)
 
-#define mono_array_copy(array,len,buf) \
-mono_array_copy_b(array,len,buf,len)
+#define mono_array_in(array,len,buf) \
+mono_array_in_b(array,len,buf,len)
+
+#define mono_array_out(array,p,len) \
+do { \
+	if ((p) != NULL && (len) > 0) \
+		memcpy(mono_array_addr(array, unsigned char, 0), p, len); \
+} while (0)
+
+#define mono_array_out_b(array,buf) \
+mono_array_out(array,(buf)->data,(buf)->offset) \
 
 typedef struct {
 	const char	*i_name;

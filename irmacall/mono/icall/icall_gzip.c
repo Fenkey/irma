@@ -8,16 +8,14 @@ static MonoArray* __gzip(MonoArray *data)
 	int len = mono_array_length(data);
 	if (len <= 0)
 		return mono_array_new(app->domain, mono_get_byte_class(), 0);
-	mono_array_copy(data, len, app->buf);
+	mono_array_in(data, len, app->buf);
 
 	len = 0;
 	buf_t *output = w->pool->lend(w->pool, 0, 0);
 	if (gzip(app->buf->data, app->buf->offset, output))
 		len = output->offset;
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	int i = 0;
-	for (; i < len; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)output->data)[i]);
+	mono_array_out(ret, output->data, len);
 
 	buf_force_reset(app->buf);
 	buf_force_reset(output);
@@ -33,16 +31,14 @@ static MonoArray* __gunzip(MonoArray *data)
 	int len = mono_array_length(data);
 	if (len <= 0)
 		return mono_array_new(app->domain, mono_get_byte_class(), 0);
-	mono_array_copy(data, len, app->buf);
+	mono_array_in(data, len, app->buf);
 
 	len = 0;
 	buf_t *output = w->pool->lend(w->pool, 0, 0);
 	if (gunzip(app->buf->data, app->buf->offset, output))
 		len = output->offset;
-	int i = 0;
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	for (; i < len; i++)
-		mono_array_set(ret, unsigned char, i, ((unsigned char*)output->data)[i]);
+	mono_array_out(ret, output->data, len);
 
 	buf_force_reset(app->buf);
 	buf_force_reset(output);
