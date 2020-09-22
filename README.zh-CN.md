@@ -52,6 +52,12 @@ hiredis installed location ? [/home/fenkey/local/hiredis]
 ########################################
 smtp support ? [y]
 
+########################################
+# log config:
+########################################
+log prefix (string with valid characters or numbers, of which the length is limited to 20): [irma]
+log file generated hourly support ? [n]
+
 The irma is now hopefully configured for your setup.
 Check the config.in & config.h files and do 'make' to build it.
 ```
@@ -127,7 +133,7 @@ $ irmacall
 
 $ irmacall -v
 irmacall 0.8
-Features: fetcher fuse c_ares memcached redis smtp
+Features: fetcher fuse c_ares memcached redis smtp logprefx('irma')
 ```
 
 ## 项目示例
@@ -192,6 +198,8 @@ $ cat Bin/Debug/log/event/irma_20200903.log
 [15:01:38,875054|032299|7f017783e780] Core - Total (4) workers have been booted up successfully
 [15:01:38,875149|032299|7f0153fff700] Kit - Service start
 ```
+
+留意如果在执行`make config`中选择了支持`loghourly`，则上述日志文件名称应该是：'irma_2020090315.log'. `loghourly`将导致按每小时方式生成独立日志文件。
 
 配置Nginx（前提需要先安装Nginx），并确保配置后Nginx reload或restart：
 

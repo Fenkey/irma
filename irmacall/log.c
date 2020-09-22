@@ -11,22 +11,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <errno.h>
 #include "wrapper.h"
 #include "misc.h"
 #include "log.h"
+#include "../config.h"
 
-#define LOGDIR			"log"
-#define _L_(d)			LOGDIR"/"#d
-#define LOG_COUNT		6
-#define BUF_COUNT_MIN	100
+#define LOGDIR		"log"
+#define _L_(d)		LOGDIR"/"#d
+#define LOGCOUNT	6
+#define LOGBUF_MIN	100
 
 #define LI ((log_inner_t*)log->priv)
 
 typedef struct {
 	int fd;
 	char datestamp[12];
-	const char *prefix;
 	const char *dir;
 	buf_t **buf;
 	int buf_count;
@@ -39,7 +40,7 @@ static const char* datestamp(char buf[12])
 	time_t t = time(NULL);
 	struct tm tm;
 	localtime_r(&t, &tm);
-	#ifdef LOGFILE_HOUR
+	#ifdef SUPPORT_LOGHOURLY
 	sprintf(buf, "%04d%02d%02d%02d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday, tm.tm_hour);
 	#else
 	sprintf(buf, "%04d%02d%02d", tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday);
@@ -73,7 +74,7 @@ static void free_log_inner(log_inner_t *li)
 {
 	int i, j;
 	log_inner_t *pl;
-	for (i = 0; i < LOG_COUNT; i++) {
+	for (i = 0; i < LOGCOUNT; i++) {
 		pl = &li[i];
 		if (pl->fd > 0)
 			close(pl->fd);
@@ -90,9 +91,9 @@ static void free_log_inner(log_inner_t *li)
 	free(li);
 }
 
-static log_inner_t* log_inner_new(const char *prefix, int buf_count, buf_pool_t *pool)
+static log_inner_t* log_inner_new(int buf_count, buf_pool_t *pool)
 {
-	log_inner_t *li = xcalloc(LOG_COUNT, sizeof(log_inner_t));
+	log_inner_t *li = xcalloc(LOGCOUNT, sizeof(log_inner_t));
 	li[0].dir = _L_(debug);
 	li[0].buf_count = 1;
 	li[1].dir = _L_(event);
@@ -108,13 +109,12 @@ static log_inner_t* log_inner_new(const char *prefix, int buf_count, buf_pool_t 
 
 	int i, j;
 	log_inner_t *pl;
-	for (i = 0; i < LOG_COUNT; i++) {
+	for (i = 0; i < LOGCOUNT; i++) {
 		pl = &li[i];
 		if (__mkdir(pl->dir) < 0) {
 			free_log_inner(li);
 			return NULL;
 		}
-		pl->prefix = prefix;
 		datestamp(pl->datestamp);
 		pl->buf = xcalloc(pl->buf_count, sizeof(buf_t*));
 		for (j = 0; j < pl->buf_count; j++)
@@ -128,9 +128,9 @@ static log_inner_t* log_inner_new(const char *prefix, int buf_count, buf_pool_t 
 	return li;
 }
 
-static log_inner_t* log_inner_new_simple(const char *prefix)
+static log_inner_t* log_inner_new_simple()
 {
-	log_inner_t *li = xcalloc(LOG_COUNT, sizeof(log_inner_t));
+	log_inner_t *li = xcalloc(LOGCOUNT, sizeof(log_inner_t));
 	li[0].dir = _L_(debug);
 	li[0].buf_count = 1;
 	li[1].dir = _L_(event);
@@ -146,13 +146,12 @@ static log_inner_t* log_inner_new_simple(const char *prefix)
 
 	int i, j;
 	log_inner_t *pl;
-	for (i = 0; i < LOG_COUNT; i++) {
+	for (i = 0; i < LOGCOUNT; i++) {
 		pl = &li[i];
 		if (__mkdir(pl->dir) < 0) {
 			free_log_inner(li);
 			return NULL;
 		}
-		pl->prefix = prefix;
 		datestamp(pl->datestamp);
 		pl->buf = xcalloc(pl->buf_count, sizeof(buf_t*));
 		for (j = 0; j < pl->buf_count; j++)
@@ -166,7 +165,7 @@ static int openfile(log_inner_t *pl)
 	if (pl->fd > 0)
 		close(pl->fd);
 	char file[48];
-	sprintf(file, "%s/%s_%s.log", pl->dir, pl->prefix, pl->datestamp);
+	sprintf(file, "%s/%s_%s.log", pl->dir, CONFIG_LOGPREFIX, pl->datestamp);
 	pl->fd = open(file, O_CREAT|O_APPEND|O_WRONLY, 0666);
 	return pl->fd;
 }
@@ -219,44 +218,55 @@ static void __log(log_inner_t *pl, const char *content, int len)
 static void __log_sync(log_inner_t *li)
 {
 	int i;
-	for (i = 0; i < LOG_COUNT; i++) {
+	for (i = 0; i < LOGCOUNT; i++) {
 		if (li[i].buf_used > 0)
 			__sync(&li[i]);
 	}
 }
 
-/* API */
-log_t* log_new(const char *prefix, logtype_t *logbase, int buf_count, buf_pool_t *pool, int cbuf_size)
+static int prefix_check()
 {
-	assert(pool && logbase && cbuf_size > 64);
+	const char *p = CONFIG_LOGPREFIX;
+	if (!p)
+		return 0;
+	int len = strlen(p);
+	if (len <= 0 || len > 20)
+		return 0;
+	for (; *p; p++) {
+		if (!isalnum((int)*p))
+			return 0;
+	}
+	return 1;
+}
+
+/* API */
+log_t* log_new(logtype_t *logbase, int buf_count, buf_pool_t *pool, int cbuf_size)
+{
+	assert(pool && logbase && cbuf_size > 64 && prefix_check());
 	if (__mkdir(LOGDIR) < 0)
 		return NULL;
-	if (!prefix)
-		prefix = "";
-	if (buf_count < BUF_COUNT_MIN)
-		buf_count = BUF_COUNT_MIN;
+	if (buf_count < LOGBUF_MIN)
+		buf_count = LOGBUF_MIN;
 	if (*logbase == LT_DEBUG)
 		buf_count = 1;
 	log_t *log = xcalloc(1, sizeof(log_t));
 	log->logbase = logbase;
 	log->cbuf = xmalloc(cbuf_size);
 	log->cbuf_size = cbuf_size;
-	log->priv = log_inner_new(prefix, buf_count, pool);
+	log->priv = log_inner_new(buf_count, pool);
 	return log;
 }
 
-log_t* log_new_simple(const char *prefix, logtype_t *logbase, int cbuf_size)
+log_t* log_new_simple(logtype_t *logbase, int cbuf_size)
 {
-	assert(logbase && cbuf_size > 64);
+	assert(logbase && cbuf_size > 64 && prefix_check());
 	if (__mkdir(LOGDIR) < 0)
 		return NULL;
-	if (!prefix)
-		prefix = "";
 	log_t *log = xcalloc(1, sizeof(log_t));
 	log->logbase = logbase;
 	log->cbuf = xmalloc(cbuf_size);
 	log->cbuf_size = cbuf_size;
-	log->priv = log_inner_new_simple(prefix);
+	log->priv = log_inner_new_simple();
 	return log;
 }
 

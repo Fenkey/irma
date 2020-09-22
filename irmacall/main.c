@@ -37,7 +37,7 @@ static int usage(service_t *s)
 
 static int version(service_t *s)
 {
-	char buf[128] = { 0 };
+	char buf[256] = { 0 };
 	strcat(buf, " fetcher");
 	strcat(buf, " fuse");
 	#ifdef SUPPORT_C_ARES
@@ -52,6 +52,10 @@ static int version(service_t *s)
 	#ifdef SUPPORT_SMTP
 	strcat(buf, " smtp");
 	#endif
+	#ifdef SUPPORT_LOGHOURLY
+	strcat(buf, " loghourly");
+	#endif
+	sprintf(buf + strlen(buf), " logprefx('%s')", CONFIG_LOGPREFIX);
 	s->console_printf("irmacall %s\nFeatures:%s\n", VERSION, buf);
 	return -1;
 }

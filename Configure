@@ -20,6 +20,14 @@ P()
 	echo "\n########################################\n# $1\n########################################"
 }
 
+C()
+{
+	read -p "$1: [$2] " ans
+	if [ "$ans" = "" ]; then ans="$2"; fi
+	echo "#define $3 \"$ans\"" >> $HF
+	echo "$3 = $ans" >> $CF
+}
+
 L()
 {
 	read -p "$1 installed location ? [$2] " ans
@@ -74,6 +82,10 @@ fi
 
 P "smtp config:"
 S "smtp" y "SUPPORT_SMTP"
+
+P "log config:"
+C "log prefix (string with valid characters or numbers, of which the length is limited to 20)" "irma" "CONFIG_LOGPREFIX"
+S "log file generated hourly" n "SUPPORT_LOGHOURLY"
 
 END
 

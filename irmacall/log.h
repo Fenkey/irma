@@ -26,8 +26,8 @@ typedef struct {
 	void		*priv;
 } log_t;
 
-log_t* log_new(const char *prefix, logtype_t *logbase, int buf_count, buf_pool_t *pool, int cbuf_size);
-log_t* log_new_simple(const char *prefix, logtype_t *logbase, int cbuf_size);
+log_t* log_new(logtype_t *logbase, int buf_count, buf_pool_t *pool, int cbuf_size);
+log_t* log_new_simple(logtype_t *logbase, int cbuf_size);
 void log_sync(log_t *log);
 void log_free(void *log);
 

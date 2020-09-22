@@ -61,7 +61,7 @@ do { \
 } while (0)
 
 #define mono_array_out_b(array,buf) \
-mono_array_out(array,(buf)->data,(buf)->offset) \
+mono_array_out(array,(buf)->data,(buf)->offset)
 
 typedef struct {
 	const char	*i_name;

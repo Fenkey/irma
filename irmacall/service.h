@@ -79,7 +79,6 @@ struct __sopt {
 
 struct __service {
 	const char	*irmacall_ver;
-	const char	*log_prefix;
 	int			log_buf_count;
 	int			thread_count;
 	int			mock_support;

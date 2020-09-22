@@ -52,6 +52,12 @@ hiredis installed location ? [/home/fenkey/local/hiredis]
 ########################################
 smtp support ? [y]
 
+########################################
+# log config:
+########################################
+log prefix (string with valid characters or numbers, of which the length is limited to 20): [irma]
+log file generated hourly support ? [n]
+
 The irma is now hopefully configured for your setup.
 Check the config.in & config.h files and do 'make' to build it.
 ```
@@ -127,7 +133,7 @@ $ irmacall
 
 $ irmacall -v
 irmacall 0.8
-Features: fetcher fuse c_ares memcached redis smtp
+Features: fetcher fuse c_ares memcached redis smtp logprefx('irma')
 ```
 
 ## Quick Start
@@ -192,6 +198,8 @@ $ cat Bin/Debug/log/event/irma_20200903.log
 [15:01:38,875054|032299|7f017783e780] Core - Total (4) workers have been booted up successfully
 [15:01:38,875149|032299|7f0153fff700] Kit - Service start
 ```
+
+Note if you choose to support `loghourly` in `make config`, the log file name of above will be like 'irma_2020090315.log'. Supporting `loghourly` will cause log files to be generated every hour.
 
 Configure the nginx (Note to reload or restart it):
 

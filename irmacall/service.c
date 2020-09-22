@@ -18,7 +18,6 @@
 #include "service.h"
 
 #define BMAX_DEFAULT		6*1024*1024
-#define LOGPREFIX_DEFAULT	"irma"
 #define LOGBUF_COUNT_MAX	500
 #define LOGBASE_ST_MAX		3600
 #define SPIRIT_INTERVAL		5
@@ -266,7 +265,7 @@ static void spirit_report(void (*)(const buf_t*));
 static int g_log_build()
 {
 	g_buf_pool = buf_pool_new();
-	g_log = log_new_simple(__s->log_prefix, &__s->logbase, 2048);
+	g_log = log_new_simple(&__s->logbase, 2048);
 	return g_log != NULL;
 }
 
@@ -1289,7 +1288,7 @@ static worker_t* worker_new(int index, litem_t *this)
 	w->index = index;
 	w->pool = buf_pool_new();
 	w->priv_sys = worker_inner_new(w->pool, this);
-	w->log = log_new(__s->log_prefix, &__s->logbase, __s->log_buf_count, w->pool, 5120);
+	w->log = log_new(&__s->logbase, __s->log_buf_count, w->pool, 5120);
 
 	w->launched = launched;
 	w->once_over = once_over;
@@ -1538,8 +1537,6 @@ static int service_check(service_t *s)
 {
 	if (!s || !s->sopt || !s->sopt->opt_parse || !s->sopt->app_init || !s->sopt->app_handle || !s->sopt->app_free)
 		return -1;
-	if (!s->log_prefix)
-		s->log_prefix = LOGPREFIX_DEFAULT;
 	if (s->log_buf_count > LOGBUF_COUNT_MAX)
 		s->log_buf_count = LOGBUF_COUNT_MAX;
 	s->thread_count = 1;
@@ -1583,7 +1580,7 @@ static int spirit_boot()
 	gethostname(p->host, sizeof(p->host));
 	time2string(&__s->start_time, p->start_time);
 	p->logbase = LT_DEBUG;
-	p->log = log_new_simple(__s->log_prefix, &p->logbase, 1024);
+	p->log = log_new_simple(&p->logbase, 1024);
 	if (WI->spirit_url->offset > 7) {
 		buf_copy(WI->spirit_url, p->url);
 		p->fetcher = fetcher_new(g_buf_pool);
