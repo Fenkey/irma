@@ -203,17 +203,13 @@ static void split_2(paramlist_t *plist, const char *str, int len, int *count, ch
 	if (p == str)
 		return;
 	param_t *new = plist->ext(plist);
-	if (!p) {
+	if (!p)
 		buf_append(new->key, str, len);
-		new->key->data[len] = 0;
-	} else {
+	else {
 		buf_append(new->key, str, p - str);
-		*(new->key->data + (p - str)) = 0;
-
-		if ((len -= p + 1 - str) > 0) {
+		if ((len -= p + 1 - str) > 0)
 			buf_append(new->value, p + 1, len);
-			*(new->value->data + len) = 0;
-		} else
+		else
 			buf_append(new->value, " ", 2);
 	}
 	if (cb)

@@ -1,6 +1,6 @@
 # IRMA
 
-IRMA, an efficient web service framework, which originated from a business project and was created because of the comprehensive reasons such as the requirement of .Net for the enterprise, SaaS & cloud automated deployment and Linux running environment etc. IRMA is built base on the Mono and the FastCGI. It uses Mono to implement the parsing and execution of C# code on Linux, and utilizes the FastCGI and Nginx to deal with the HTTP interaction. There are two parts of IRMA: `irmacall`, a multithreading scheduling engine written in C, and `irmakit`, a development framework written in C#. `irmacall` is responsible for launching & scheduling all kinds of web applications developed base on `irmakit` framework. The design concept of IRMA is: ***Simple and efficient scheduling, on-demand integration and expansion***, which really makes the IRMA look more like a toolset than a framework (In fact, it is a toolset). Anyway, I hope it's useful for you :-)
+IRMA, an efficient web service framework, which originated from a business project and was created because of the comprehensive reasons such as the requirement of .Net for the enterprise, SaaS & cloud automated deployment and Linux running environment etc. IRMA is built on the Mono and the FastCGI. It uses Mono to implement the parsing and execution of C# code on Linux, and utilizes the FastCGI and Nginx to deal with the HTTP interaction. There are two parts of IRMA: `irmacall`, a multithreading scheduling engine written in C, and `irmakit`, a development framework written in C#. `irmacall` is responsible for launching & scheduling all kinds of web applications developed on `irmakit` framework. The design concept of IRMA is: ***Simple and efficient scheduling, on-demand integration and expansion***, which really makes the IRMA look more like a toolkit than a framework (In fact, it is a toolkit). Anyway, I hope it's useful to you :-)
 
 ## Compilation & Installation
 
@@ -62,7 +62,7 @@ The irma is now hopefully configured for your setup.
 Check the config.in & config.h files and do 'make' to build it.
 ```
 
-The source links of above packages might refer as below:
+The source links of above dependencies might refer as below:
 
 * `mono`: <a src="https://github.com/mono/mono.git">https://github.com/mono/mono.git</a>
 * `openssl`: <a src="https://github.com/openssl/openssl.git">https://github.com/openssl/openssl.git</a>
@@ -152,7 +152,7 @@ $ ./start.sh
 spawn-fcgi: child spawned successfully: PID: 17701
 ```
 
-> Execute me for reminding that you have to install the command `spawn-fcgi` before starting `Foo`:
+> Excuse me for reminding that you have to install the command `spawn-fcgi` before starting `Foo`:
 
 ```bash
 $ git clone https://github.com/lighttpd/spawn-fcgi
@@ -165,7 +165,7 @@ $ echo "export PATH=$HOME/local/spawn-fcgi/bin:$PATH" >> ~/.bash_profile
 $ . ~/.bash_profile
 ```
 
-`Foo` is running in the way of multiprocess / multithreading and writes `debug` logs at the `Bin/Debug/log` directory. You might update these in the `start.sh` file:
+`Foo` is running in the way of multiprocess / multithreading and writes `debug` logs in the `Bin/Debug/log` directory. You might update these in the `start.sh` file:
 
 ```bash
 process_count=1
@@ -199,7 +199,7 @@ $ cat Bin/Debug/log/event/irma_20200903.log
 [15:01:38,875149|032299|7f0153fff700] Kit - Service start
 ```
 
-Note if you choose to support `loghourly` in `make config`, the log file name of above will be like 'irma_2020090315.log'. Supporting `loghourly` will cause log files to be generated every hour.
+Note if you choose to support `loghourly` in `make config`, the log file name of above will be like `irma_2020090315.log`. Supporting `loghourly` will cause log files to be generated every hour.
 
 Configure the nginx (Note to reload or restart it):
 

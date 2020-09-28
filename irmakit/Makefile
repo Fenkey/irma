@@ -16,7 +16,7 @@ Bin/AppGenerator.exe: AppGenerator/AppGenerator.cs
 	mcs -sdk:$(NETSDK) -warn:0 -target:exe -out:$@ $^ -r:Bin/IRMAKit.dll @irmakit.rsp
 
 install:
-	@echo "Installing kit libraries $(ASSEMBLYDIR) ..."
+	@echo "Installing kit libraries on $(ASSEMBLYDIR) ..."
 	cp ../irmacall/mono/cs/linux/IRMACore.dll ../irmacall/mono/cs/windows/IRMACore-windows.dll $(ASSEMBLYDIR)/
 	cp Bin/*.dll $(ASSEMBLYDIR)/
 	cp -a Bin/AppGenerator.exe AppSample $(ASSEMBLYDIR)/

@@ -199,7 +199,7 @@ $ cat Bin/Debug/log/event/irma_20200903.log
 [15:01:38,875149|032299|7f0153fff700] Kit - Service start
 ```
 
-留意如果在执行`make config`中选择了支持`loghourly`，则上述日志文件名称应该是：'irma_2020090315.log'. `loghourly`将导致按每小时方式生成独立日志文件。
+留意如果在执行`make config`中选择了支持`loghourly`，则上述日志文件名称应该是：`irma_2020090315.log`. `loghourly`将导致按每小时方式生成独立日志文件。
 
 配置Nginx（前提需要先安装Nginx），并确保配置后Nginx reload或restart：
 

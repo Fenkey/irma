@@ -83,7 +83,8 @@ static int form_param_find3(void *data, void *val)
 static void fparamlist_reset(fparamlist_t *fplist)
 {
 	assert(fplist);
-	if (FPLI->count + FPLI->fcount > 0) {
+	/* Is dirty ? */
+	if (!FPLI->list->isempty(FPLI->list)) {
 		list_free(FPLI->list);
 		FPLI->list = list_new(&form_param_free);
 		FPLI->count = 0;
@@ -280,7 +281,7 @@ static int parse(fparamlist_t *fplist, buf_t *body, const char *boundary, int bl
 			FPLI->count++;
 		}
 
-		/* Get Content. */
+		/* Get Content. (4: "\r\n--") */
 		q1 = memstr(p, body->offset - (p - body->data), boundary, blen);
 		if (!q1 || q1 - p < 4)
 			goto __exception;

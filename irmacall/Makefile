@@ -58,7 +58,7 @@ mono/cs/windows/IRMACore-windows.dll: mono/cs/windows/ICall.cs mono/cs/Net.cs
 	$(MCS) -sdk:$(NETSDK) -target:library -out:$@ $^ -r:System.Web -r:System.Net -r:System.Net.Http -r:System.IO.Compression
 
 install:
-	@echo "Installing call binaries in $(BINDIR) ..."
+	@echo "Installing call binaries on $(BINDIR) ..."
 	cp irmacall irma-launch irma-stop irma-reload irma-xlogbase irma-runtime irma-top $(BINDIR)/
 
 clean:

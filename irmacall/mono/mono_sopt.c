@@ -237,7 +237,7 @@ static int app_mono_init(worker_t *w)
 	/*
 	 * This process may not be suitable for race start with unmanaged thread lock. For example,
 	 * creating MySQL objects at this stage may lead to segment exception (SIGSEGV) due to static
-	 * links and other reasons. So based on security reasons, it's better to invoke app_mono_init()
+	 * links and other reasons. So for the security reasons, you'd better invoke app_mono_init()
 	 * iteratively (launch_next).
 	 */
 	app_t *app = (app_t*)w->priv_app;
