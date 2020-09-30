@@ -148,6 +148,14 @@ char* buf_data(buf_t *buf, unsigned int len)
 	return __buf_data(buf, len);
 }
 
+/*
+ * FIX: The 'fmt' is sensitive that it can easily lead to memory overflow.
+ * For example the code as below is wrong:
+ * buf_printf(buf, p); // Especially when p contains '%'
+ *
+ * The correct way is to specify the 'fmt':
+ * buf_printf(buf, "%s", p);
+ */
 char* buf_printf(buf_t *buf, const char *fmt, ...)
 {
 	assert(buf && buf->size >= buf->offset);
@@ -173,6 +181,14 @@ char* buf_printf(buf_t *buf, const char *fmt, ...)
 	return buf->data;
 }
 
+/*
+ * FIX: The 'fmt' is sensitive that it can easily lead to memory overflow.
+ * For example the code as below is wrong:
+ * buf_printf_ext(buf, p); // Especially when p contains '%'
+ *
+ * The correct way is to specify the 'fmt':
+ * buf_printf_ext(buf, "%s", p);
+ */
 char* buf_printf_ext(buf_t *buf, const char *fmt, ...)
 {
 	assert(buf && buf->size >= buf->offset);

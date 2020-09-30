@@ -83,13 +83,9 @@ static int form_param_find3(void *data, void *val)
 static void fparamlist_reset(fparamlist_t *fplist)
 {
 	assert(fplist);
-	/* Is dirty ? */
-	if (!FPLI->list->isempty(FPLI->list)) {
-		list_free(FPLI->list);
-		FPLI->list = list_new(&form_param_free);
-		FPLI->count = 0;
-		FPLI->fcount = 0;
-	}
+	FPLI->count = 0;
+	FPLI->fcount = 0;
+	FPLI->list->clear(FPLI->list);
 }
 
 static int fparamlist_count(fparamlist_t *fplist)
@@ -290,7 +286,7 @@ static int parse(fparamlist_t *fplist, buf_t *body, const char *boundary, int bl
 		continue;
 
 	__exception:
-		buf_printf(fp->content, "(invalid)");
+		buf_printf(fp->content, "%s", "(Invalid)");
 		break;
 	}
 	if (fcount)

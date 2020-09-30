@@ -201,11 +201,6 @@ static void __log(log_inner_t *pl, const char *content, int len)
 		openfile(pl);
 
 	buf_t *buf = pl->buf[pl->buf_used];
-	/*
-	 * Don't use buf_printf because the content maybe contains '%'.
-	 * buf_data(buf, 64 + len);
-	 * buf_printf(buf, "%s%c", content, *(content+len-1)=='\n' ? ' ' : '\n');
-	 */
 	buf_reset(buf);
 	buf_append(buf, content, len);
 	if (*(content + len - 1) != '\n')

@@ -633,13 +633,10 @@ static void sig_install_worker()
 static void launch_info(worker_t *w, const char *app, const char *ver, long bmax, const char *url)
 {
 	if (WI->busy < 0) {
-		buf_printf(WI->app, app ? app : "");
-		buf_printf(WI->ver, ver ? ver : "");
-		if (url) {
-			/* Don't use buf_printf because the url maybe contains '%'. */
-			buf_reset(WI->spirit_url);
-			buf_append(WI->spirit_url, url, strlen(url));
-		}
+		buf_printf(WI->app, "%s", app ? app : "");
+		buf_printf(WI->ver, "%s", ver ? ver : "");
+		if (url)
+			buf_printf(WI->spirit_url, "%s", url);
 		if (bmax > 0)
 			WI->bmax = bmax;
 	}
@@ -809,8 +806,8 @@ static int request_basic_parse(worker_t *w)
 			buf_data(WI->req_body, len);
 		/*
 		 * We ignore the case of len <= 0 and try to extract the body according
-		 * to the actual situation. However, if the len is effective, we would
-		 * compare whether the actual length is consistent eventually.
+		 * to the actual situation. However, if the len is effective, we will
+		 * always check whether the actual length is consistent eventually.
 		 */
 		do {
 			if ((n = FCGX_GetStr(WI->cbuf, size, WI->req.in)) > 0) {
@@ -1170,7 +1167,7 @@ static buf_t* request_dump(worker_t *w)
 	char **p = __envp(w);
 	for (; p && *p; p++)
 		buf_printf_ext(dump, "%s\r\n", *p);
-	buf_printf_ext(dump, "\r\n");
+	buf_append(dump, "\r\n", 2);
 	buf_append(dump, WI->req_body->data, WI->req_body->offset);
 	return dump;
 }
@@ -1229,10 +1226,16 @@ static void fill_headers(param_t *p, buf_t *buf)
 
 static int send_header(worker_t *w)
 {
-	buf_printf(WI->buf, "HTTP/1.1 200 OK\r\nStatus: 200 OK\r\n");
+	/*
+	 * For security, we use buf_printf instead of buf_append to
+	 * start building the package. It's equivalent to:
+	 * buf_reset(WI->buf);
+	 * buf_append(WI->buf, ...);
+	 */
+	buf_printf(WI->buf, "%s", "HTTP/1.1 200 OK\r\nStatus: 200 OK\r\n");
 	WI->res_header_param->print(WI->res_header_param, &fill_headers, WI->buf);
 	if (!WI->res_header_param->find(WI->res_header_param, "Content-Type"))
-		buf_printf_ext(WI->buf, "Content-Type: text/html\r\n");
+		buf_append(WI->buf, "Content-Type: text/html\r\n", 25);
 	buf_append(WI->buf, "\r\n", 2);
 	return fcgi_send(WI->buf->data, WI->buf->offset, w);
 }
@@ -1244,13 +1247,7 @@ static int redirect(worker_t *w, const char *location)
 	int len = strlen(location);
 	if (len <= 0)
 		return 0;
-	/*
-	 * Don't use buf_printf because the location maybe contains '%' such as '%2F' etc.
-	 * buf_printf(WI->buf, "HTTP/1.1 302 Moved Temporarily\r\nLocation: %s\r\n\r\n", location);
-	 */
-	buf_printf(WI->buf, "HTTP/1.1 302 Moved Temporarily\r\nLocation: ");
-	buf_append(WI->buf, location, len);
-	buf_append(WI->buf, "\r\n\r\n", 4);
+	buf_printf(WI->buf, "HTTP/1.1 302 Moved Temporarily\r\nLocation: %s\r\n\r\n", location);
 	return fcgi_send(WI->buf->data, WI->buf->offset, w);
 }
 
@@ -1259,7 +1256,7 @@ static int __send_http(worker_t *w, int rescode, const char *desc, buf_t *conten
 	buf_printf(WI->buf, "HTTP/1.1 %d %s\r\nStatus: %d %s\r\n", rescode, desc, rescode, desc);
 	WI->res_header_param->print(WI->res_header_param, &fill_headers, WI->buf);
 	if (!WI->res_header_param->find(WI->res_header_param, "Content-Type"))
-		buf_printf_ext(WI->buf, "Content-Type: text/html\r\n");
+		buf_append(WI->buf, "Content-Type: text/html\r\n", 25);
 	if (content && content->offset > 0) {
 		buf_printf_ext(WI->buf, "Content-Length: %u\r\n\r\n", content->offset);
 		buf_append(WI->buf, content->data, content->offset);

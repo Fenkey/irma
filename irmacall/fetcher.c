@@ -175,7 +175,6 @@ static long run(fetcher_t *f, const char *url, int urllen, method_t method, int 
 {
 	int ret = 0;
 
-	/* Don't use buf_printf(f->req_url, url) because the url maybe contains '%'. */
 	buf_append(f->req_url, url, urllen);
 	f->req_method = method;
 

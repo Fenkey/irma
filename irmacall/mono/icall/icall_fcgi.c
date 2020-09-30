@@ -92,9 +92,8 @@ static MonoString* get_all_request_headers()
 
 	char **p = w->fcgi_params(w);
 	for (; *p; p++) {
-		if (strncasecmp(*p, "HTTP_", 5))
-			continue;
-		buf_printf_ext(app->buf, "%s\r\n", *p);
+		if (!strncasecmp(*p, "HTTP_", 5))
+			buf_printf_ext(app->buf, "%s\r\n", *p);
 	}
 
 	MonoString *ret = NULL;

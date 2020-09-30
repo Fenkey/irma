@@ -62,12 +62,9 @@ static int param_find(void *data, void *val)
 static void paramlist_reset(paramlist_t *plist)
 {
 	assert(plist);
-	if (PLI->count > 0) {
-		list_free(PLI->list);
-		PLI->list = list_new(&param_free);
-		PLI->count = 0;
-	}
+	PLI->count = 0;
 	buf_reset(PLI->buf);
+	PLI->list->clear(PLI->list);
 }
 
 static void paramlist_print(paramlist_t *plist, param_print_t pf, buf_t *buf)
@@ -112,7 +109,7 @@ static param_t* paramlist_set(paramlist_t *plist, const char *key, const char *v
 	} else
 		p = plist->ext(plist);
 	if (p->key->offset <= 0)
-		buf_printf(p->key, key);
+		buf_printf(p->key, "%s", key);
 	buf_reset(p->value);
 	buf_append(p->value, value, vlen <= 0 ? strlen(value) : vlen);
 	return p;
@@ -210,7 +207,7 @@ static void split_2(paramlist_t *plist, const char *str, int len, int *count, ch
 		if ((len -= p + 1 - str) > 0)
 			buf_append(new->value, p + 1, len);
 		else
-			buf_append(new->value, " ", 2);
+			buf_append(new->value, " ", 1);
 	}
 	if (cb)
 		cb(new, PLI->buf);

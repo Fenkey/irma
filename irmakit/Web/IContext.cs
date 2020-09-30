@@ -52,7 +52,7 @@ namespace IRMAKit.Web
 		ISession Session { get; }
 
 		/// <summary>
-		/// Fresh memory (be valid in period of once handle)
+		/// Flash memory (be valid in period of once handle)
 		/// </summary>
 		Dictionary<string, object> FM { get; }
 

@@ -45,22 +45,24 @@ static int mail(
 	}
 	smtp->clean(smtp);
 
-	buf_printf(smtp->to, p_to);
-	buf_printf(smtp->subject, p_subject);
-	buf_printf(smtp->content, p_content);
+	buf_append(smtp->to, p_to, strlen(p_to));
+	buf_append(smtp->subject, p_subject, strlen(p_subject));
+	buf_append(smtp->content, p_content, strlen(p_content));
+
 	char *p;
 	if ((p = mono_string_to_utf8(a0)) != NULL) {
-		buf_printf(smtp->attachment[0], p);
+		buf_append(smtp->attachment[0], p, strlen(p));
 		mono_free(p);
 	}
 	if ((p = mono_string_to_utf8(a1)) != NULL) {
-		buf_printf(smtp->attachment[1], p);
+		buf_append(smtp->attachment[1], p, strlen(p));
 		mono_free(p);
 	}
 	if ((p = mono_string_to_utf8(a2)) != NULL) {
-		buf_printf(smtp->attachment[2], p);
+		buf_append(smtp->attachment[2], p, strlen(p));
 		mono_free(p);
 	}
+
 	ret = smtp->mail(smtp, hideto, 0);
 	if (ret < 0 && *smtp->error && error)
 		*error = mono_string_new(app->domain, smtp->error);

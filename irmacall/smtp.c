@@ -35,11 +35,11 @@ static smtp_inner_t* new_smtp_inner(buf_pool_t *pool, const char *server, const 
 		return NULL;
 	}
 	si->server = pool->lend(pool, 0, 0);
-	buf_printf(si->server, server);
+	buf_printf(si->server, "%s", server);
 	si->user = pool->lend(pool, 0, 0);
-	buf_printf(si->user, user);
+	buf_printf(si->user, "%s", user);
 	si->password = pool->lend(pool, 0, 0);
-	buf_printf(si->password, password);
+	buf_printf(si->password, "%s", password);
 	si->h_from = pool->lend(pool, 0, 0);
 	si->h_to = pool->lend(pool, 0, 0);
 	si->h_subject = pool->lend(pool, 0, 0);
@@ -332,7 +332,7 @@ static void smtp_clean(smtp_t *s)
 {
 	buf_reset(s->to);
 	buf_reset(s->subject);
-	buf_reset(s->content);
+	buf_force_reset(s->content);
 	int i = 0;
 	for (; i < sizeof(s->attachment)/sizeof(*s->attachment); i++)
 		buf_reset(s->attachment[i]);
