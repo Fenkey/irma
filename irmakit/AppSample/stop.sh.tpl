@@ -2,4 +2,4 @@
 
 dll=`pwd`/Bin/Debug/${appName}.dll
 
-irma-stop "$dll" 
+irma-stop "$dll"

@@ -25,7 +25,7 @@ namespace ${appName}.Web
 			string user = o.Value<string>("user");
 			string password = o.Value<string>("password");
 			string db = o.Value<string>("db");
-			// Here you should double check the validity of parameters and throw exception if failed 
+			// Here you should double check the validity of parameters and throw exception if failed
 			context["dbs"] = new MySqlStore(host, port, user, password, db);
 		}
 
@@ -34,7 +34,7 @@ namespace ${appName}.Web
 			JObject o = context.Config.User.Value<JObject>("mc");
 			string servers = o.Value<string>("servers");
 			string instance = o.Value<string>("instance");
-			// Here you should double check the validity of parameters and throw exception if failed 
+			// Here you should double check the validity of parameters and throw exception if failed
 			/*
 			 * Or use others engine:
 			 * context["mc"] = new CMemcachedStore(servers, instance);
@@ -53,7 +53,7 @@ namespace ${appName}.Web
 			string server = o.Value<string>("server");
 			string user = o.Value<string>("user");
 			string password = o.Value<string>("password");
-			// Here you should double check the validity of parameters and throw exception if failed 
+			// Here you should double check the validity of parameters and throw exception if failed
 			context["smtp"] = new Smtp(server, user, password);
 		}
 

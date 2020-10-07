@@ -22,7 +22,7 @@ namespace ${appName}.Web
 			for (int i = 0; i < size.Count; i++) {
 				long s = -1;
 				try {
-					s = (long)size[i]; 
+					s = (long)size[i];
 				} catch {
 					s = unit.ParseBytes((string)size[i]);
 				}
@@ -34,7 +34,7 @@ namespace ${appName}.Web
 			for (int i = 0; i < time.Count; i++) {
 				long t = -1;
 				try {
-					t = (long)time[i]; 
+					t = (long)time[i];
 				} catch {
 					t = unit.ParseSeconds((string)time[i]);
 				}

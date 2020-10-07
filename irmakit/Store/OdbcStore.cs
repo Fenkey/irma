@@ -45,7 +45,7 @@ namespace IRMAKit.Store
 		{
 			this.connectionString = connectionString;
 			this.connection = new OdbcConnection(this.connectionString);
-			// FIX: It's best to do it later. 
+			// FIX: Do it later.
 			//try { connection.Open(); } catch {}
 		}
 
@@ -61,7 +61,7 @@ namespace IRMAKit.Store
 				.Append(";Charset=").Append(string.IsNullOrEmpty(charset) ? "utf8" : charset);
 			this.connectionString = sb.ToString();
 			this.connection = new OdbcConnection(this.connectionString);
-			// FIX: It's best to do it later. 
+			// FIX: Do it later.
 			//try { connection.Open(); } catch {}
 		}
 
@@ -83,7 +83,7 @@ namespace IRMAKit.Store
 				sb.Append(";Allow User Variables=true");
 			this.connectionString = sb.ToString();
 			this.connection = new OdbcConnection(this.connectionString);
-			// FIX: It's best to do it later. 
+			// FIX: Do it later.
 			//try { connection.Open(); } catch {}
 		}
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Text;
 using IRMAKit.Utils;
@@ -36,7 +36,7 @@ namespace ${appName}.Web
 				byte[] bytes = new byte[fs.Length];
 				fs.Read(bytes, 0, bytes.Length);
 				return bytes;
-			} 
+			}
 		}
 
 		private void EchoResource(IContext context, string contentType, string file, bool zip=false)

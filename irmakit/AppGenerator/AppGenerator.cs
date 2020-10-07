@@ -534,7 +534,7 @@ public class AppGenerator
 			{"sourceFiles", "Properties/AssemblyInfo.cs Web/*.cs"}
 		});
 		string file = string.Format("{0}/Makefile", _appDir);
-		// FIX: It's best that the Makefile is encoded as ASCII.
+		// Note to encode the Makefile as ASCII instead of UTF-8
 		using (StreamWriter sw = new StreamWriter(file, true, Encoding.ASCII)) {
 			sw.Write(source);
 		}

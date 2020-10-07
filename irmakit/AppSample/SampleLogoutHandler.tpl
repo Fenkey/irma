@@ -9,7 +9,7 @@ namespace ${appName}.Web
 		public void Do(IContext context)
 		{
 			context.Session.Remove("userinfo");
-			// Optional 
+			// Optional
 			context.RemoveSessionCookie();
 			context.Response.Echo("Logout success !");
 		}

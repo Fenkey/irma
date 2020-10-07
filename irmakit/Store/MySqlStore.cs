@@ -50,7 +50,7 @@ namespace IRMAKit.Store
 				connectionString += ";Pooling=true; Max Pool Size=100";
 			this.connectionString = connectionString;
 			this.connection = new MySqlConnection(this.connectionString);
-			// FIX: It's best to do it later. 
+			// FIX: Do it later.
 			//try { connection.Open(); } catch {}
 		}
 
@@ -71,7 +71,7 @@ namespace IRMAKit.Store
 				sb.Append(";Allow User Variables=true");
 			this.connectionString = sb.ToString();
 			this.connection = new MySqlConnection(this.connectionString);
-			// FIX: It's best to do it later. 
+			// FIX: Do it later.
 			//try { connection.Open(); } catch {}
 		}
 

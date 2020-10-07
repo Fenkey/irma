@@ -18,7 +18,7 @@
 			}
 		},
 		"performance": "${appName}.Web.HandlePerformance",
-		"routers": [ 
+		"routers": [
 			{ "path": "^/s/n/",              "handler": "${appName}.Web.StaticHandler",          "methods": "GET"                  },
 			{ "path": "^/s/c/",              "handler": "${appName}.Web.CStaticHandler",         "methods": "GET"                  },
 			{ "path": "^/$",                 "handler": "${appName}.Web.IndexHandler",           "methods": "GET",      "pf": true },

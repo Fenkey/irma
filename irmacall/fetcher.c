@@ -247,7 +247,7 @@ static long run(fetcher_t *f, const char *url, int urllen, method_t method, int 
 	/*
 	 * Maybe it isn't a good idea to set CURLOPT_FORBID_REUSE. When we reuse an idle connection, perform()
 	 * will return CURLE_OPERATION_TIMEDOUT (28) and cause the remote client to close and change the state
-	 * to FIN_WAIT1/2. In addition, we don't know when it's the best time to fresh a connection by setting
+	 * to FIN_WAIT1/2. In addition, we don't know when is the best time to fresh a connection by setting
 	 * CURLOPT_FRESH_CONNECT. Any suggestions ?
 	 */
 	curl_easy_setopt(FI->curl, CURLOPT_FORBID_REUSE, 1L);

@@ -2,4 +2,4 @@
 
 dll=`pwd`/Bin/Debug/${appName}.dll
 
-irma-xlogbase "$dll" 
+irma-xlogbase "$dll"
