@@ -254,15 +254,16 @@ namespace IRMAKit.Web
 			get { return this.oriAppLocation; }
 		}
 
-		/*
-		 * If the port represents an individual service, you should not set AppName.
-		 * Otherwise, you should set it and visit it like: http://<ip>:<port>/<AppName>
-		 */
 		private string appLocation;
 		public string AppLocation
 		{
 			get {
 				if (this.appLocation == null) {
+					/*
+					 * You might not set the 'app_name' in the conf file if the
+					 * 'ip:port' represents an individual service. But whether
+					 * or not it is set, we will try to identify the exact location.
+					 */
 					string p = this.Uri.AbsolutePath;
 					if (string.IsNullOrEmpty(this.config.AppName))
 						this.appLocation = p;
@@ -283,6 +284,13 @@ namespace IRMAKit.Web
 			}
 
 			set {
+				/*
+				 * As we won't parse it again, note the value doesn't contains
+				 * the 'AppName'. In addition, if 'isRef' is true, you might
+				 * ignore some checking work that may have been completed when
+				 * request first enters. For example whether the user has logged
+				 * in and the session is valid etc.
+				 */
 				this.appLocation = value;
 				this.isRef = true;
 				this.hopCount -= 1;

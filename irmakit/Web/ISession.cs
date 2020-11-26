@@ -29,10 +29,15 @@ namespace IRMAKit.Web
 		bool Remove(string key);
 
 		/// <summary>
+		/// 踢出旧SID，相当于KickOutOnly为true方式调用AttachSid()，例如迫使某用户退出当前登录
+		/// </summary>
+		bool KickOut(string attachKey, string sessionKey);
+
+		/// <summary>
 		/// 绑定key与sid，使之关系唯一化，即同一时刻只有一个sid有效，可避免相同用户名在多处同时登录使用服务
 		/// attachKey：将与sid绑定的key，通常为登录用户名
 		/// sessionKey: session关键字
-		/// kickOutOnly: 仅踢出旧SID（不绑定当前SID），例如迫使某用户强行退出
+		/// kickOutOnly: 仅踢出旧SID（不绑定当前SID），例如迫使某用户退出当前登录
 		/// AttachSid() 通常在login成功后调用
 		/// </summary>
 		bool AttachSid(string attachKey, string sessionKey, bool kickOutOnly=false);

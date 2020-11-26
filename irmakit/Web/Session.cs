@@ -106,6 +106,11 @@ namespace IRMAKit.Web
 			return config.SessionStore.Delete(keyPrefix1 + key);
 		}
 
+		public bool KickOut(string attachKey, string sessionKey)
+		{
+			return AttachSid(attachKey, sessionKey, true);
+		}
+
 		public bool AttachSid(string attachKey, string sessionKey, bool kickOutOnly=false)
 		{
 			if (attachKey == null || sessionKey == null || sid == null)
@@ -122,9 +127,11 @@ namespace IRMAKit.Web
 				v = config.SessionStore.Get(oldKeyPrefix1 + sessionKey);
 				if (v != null) {
 					Dictionary<string, object> d = (Dictionary<string, object>)v;
-					long ex = (long)d["ex"];
-					d["kt"] = DateTime.Now;
-					ok = config.SessionStore.Set(oldKeyPrefix1 + sessionKey, v, ex);
+					if (!d.ContainsKey("kt")) {
+						long ex = (long)d["ex"];
+						d["kt"] = DateTime.Now;
+						ok = config.SessionStore.Set(oldKeyPrefix1 + sessionKey, v, ex>>1);
+					}
 				}
 			}
 			// 设置或覆盖最新的SID，成为attachKey所对应的唯一登录者

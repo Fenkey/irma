@@ -683,10 +683,13 @@ char* gzip(const char *input, int len, buf_t *output)
 	do {
 		s.next_out = (Bytef*)buf;
 		s.avail_out = sizeof(buf);
-		if (deflate(&s, Z_FINISH) == Z_STREAM_ERROR)
-			return NULL;
+		if (deflate(&s, Z_FINISH) == Z_STREAM_ERROR) {
+			buf_reset(output);
+			break;
+		}
 		buf_append(output, buf, sizeof(buf) - s.avail_out);
-	} while (s.avail_out == 0);
+	} while (s.avail_out == 0)
+		;
 	deflateEnd(&s);
 
 	return output->data;
@@ -709,10 +712,13 @@ char* gunzip(const char *input, int len, buf_t *output)
 	do {
 		s.next_out = (Bytef*)buf;
 		s.avail_out = sizeof(buf);
-		if (inflate(&s, Z_FINISH) == Z_STREAM_ERROR)
-			return NULL;
+		if (inflate(&s, Z_FINISH) == Z_STREAM_ERROR) {
+			buf_reset(output);
+			break;
+		}
 		buf_append(output, buf, sizeof(buf) - s.avail_out);
-	} while (s.avail_out == 0);
+	} while (s.avail_out == 0)
+		;
 	inflateEnd(&s);
 
 	return output->data;

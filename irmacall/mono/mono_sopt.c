@@ -410,7 +410,7 @@ static int app_free(worker_t *w, int finalize)
 		app->buf = NULL;
 	}
 	/*
-	 * NOTE NOT mono_free(app->obj_service) !
+	 * DON NOT mono_free(app->obj_service) !
 	 * It'll be retrieved by mono GC.
 	 */
 	free(app);

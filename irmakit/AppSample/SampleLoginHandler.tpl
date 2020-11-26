@@ -54,7 +54,7 @@ namespace ${appName}.Web
 				ui = new UserInfo(name);
 				context.Session["userinfo"] = ui;
 				res.Echo("Welcome " + name + ", it's your first login !");
-				// You can invoke AttachSid() to make sure the session is sole at present moment.
+				// You can invoke KickOut() or AttachSid() to make it the only session associated with the login 'name'.
 				context.Session.AttachSid(name, "userinfo");
 				return;
 			}

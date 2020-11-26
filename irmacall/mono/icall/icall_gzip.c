@@ -1,6 +1,6 @@
 #include "icall.h"
 
-static MonoArray* __gzip(MonoArray *data)
+static MonoArray* __g(MonoArray *data, char* (*f)(const char*, int, buf_t*))
 {
 	worker_t *w = CURRENT;
 	app_t *app = (app_t*)w->priv_app;
@@ -12,7 +12,7 @@ static MonoArray* __gzip(MonoArray *data)
 
 	len = 0;
 	buf_t *output = w->pool->lend(w->pool, 0, 0);
-	if (gzip(app->buf->data, app->buf->offset, output))
+	if ((*f)(app->buf->data, app->buf->offset, output))
 		len = output->offset;
 	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
 	mono_array_out(ret, output->data, len);
@@ -23,27 +23,14 @@ static MonoArray* __gzip(MonoArray *data)
 	return ret;
 }
 
+static MonoArray* __gzip(MonoArray *data)
+{
+	return __g(data, &gzip);
+}
+
 static MonoArray* __gunzip(MonoArray *data)
 {
-	worker_t *w = CURRENT;
-	app_t *app = (app_t*)w->priv_app;
-
-	int len = mono_array_length(data);
-	if (len <= 0)
-		return mono_array_new(app->domain, mono_get_byte_class(), 0);
-	mono_array_in(data, len, app->buf);
-
-	len = 0;
-	buf_t *output = w->pool->lend(w->pool, 0, 0);
-	if (gunzip(app->buf->data, app->buf->offset, output))
-		len = output->offset;
-	MonoArray *ret = mono_array_new(app->domain, mono_get_byte_class(), len);
-	mono_array_out(ret, output->data, len);
-
-	buf_force_reset(app->buf);
-	buf_force_reset(output);
-	buf_return(output);
-	return ret;
+	return __g(data, &gunzip);
 }
 
 static icall_item_t __items[] = {

@@ -57,6 +57,18 @@ static litem_t* index(list_t *l, int i)
 	return NULL;
 }
 
+static litem_t* first(list_t *l)
+{
+	assert(l);
+	return l->tail ? l->tail->link : NULL;
+}
+
+static litem_t* last(list_t *l)
+{
+	assert(l);
+	return l->tail;
+}
+
 static litem_t* find(list_t *l, list_dfind_t dfind, void *val)
 {
 	assert(l && dfind);
@@ -104,12 +116,12 @@ static int apply(list_t *l, list_dapply_t dapply, void *val)
 	if (!l->tail)
 		return 0;
 	int ok = 0;
-	litem_t *p = l->tail;
+	litem_t *h = l->tail->link, *p = h;
 	do {
 		if (dapply(p->data, val))
 			ok++;
 		p = p->link;
-	} while (p != l->tail)
+	} while (p != h)
 		;
 	return ok;
 }
@@ -201,6 +213,18 @@ static int isempty(list_t *l)
 	return l->tail != NULL;
 }
 
+static int isfirst(list_t *l, litem_t *li)
+{
+	assert(l && li);
+	return l->tail && li == l->tail->link;
+}
+
+static int islast(list_t *l, litem_t *li)
+{
+	assert(l && li);
+	return l->tail && li == l->tail;
+}
+
 static void __clear(list_t *l)
 {
 	litem_t *p = l->tail;
@@ -250,6 +274,8 @@ list_t* list_new(list_dfree_t dfree)
 	l->put = put;
 	l->get = get;
 	l->index = index;
+	l->first = first;
+	l->last = last;
 	l->find = find;
 	l->findall = findall;
 	l->apply = apply;
@@ -259,6 +285,8 @@ list_t* list_new(list_dfree_t dfree)
 	l->append = append;
 	l->count = count;
 	l->isempty = isempty;
+	l->isfirst = isfirst;
+	l->islast = islast;
 	l->clear = clear;
 	l->toarray = toarray;
 	return l;

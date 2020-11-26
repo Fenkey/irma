@@ -19,7 +19,7 @@ namespace IRMAKit.Web
 		/*
 		 * FIX:
 		 * Don't use CurrentContext unless SystemInit() is finished !
-		 * Especially the case of the class member is static, for example:
+		 * Especially the case that the class member is static, for example:
 		 * private static string name = Service.CurrentContext.User.Value<string>("name");
 		 */
 		public static IContext CurrentContext
@@ -53,7 +53,7 @@ namespace IRMAKit.Web
 		protected virtual string LoadRouters(IConfig config)
 		{
 			/*
-			 * Return the JSON string and refer to the 'routers' setting in conf file. For example:
+			 * Return the JSON string that refers to the 'routers' setting in conf file. For example:
 			 * return "[{\"path\":\"^/$\",\"handler\":\"Foo.Web.IndexHandler\",\"methods\": \"*\",\"pf\":true}]";
 			 */
 			return null;
@@ -62,7 +62,7 @@ namespace IRMAKit.Web
 		protected virtual string LoadUser(IConfig config)
 		{
 			/*
-			 * Return the JSON string and refer to the 'user' setting in conf file. For example:
+			 * Return the JSON string that refers to the 'user' setting in conf file. For example:
 			 * return "{\"name\":\"FENKEY\"}";
 			 */
 			return null;
@@ -91,10 +91,10 @@ namespace IRMAKit.Web
 			}
 			ICall.Launched();
 			if (succLog)
-				Logger.EVENT("Kit - Service start");
+				Logger.EVENT("Kit - Service start ({0})", ICall.GetWorkerIndex());
 		}
 
-		// FIX: It's public because it might be invoked directly on windows version.
+		// FIX: It's public because it might be invoked directly in windows version.
 		public void Init(string configFile, ref object globalObj)
 		{
 			Init(configFile, ref globalObj, true);
@@ -117,7 +117,7 @@ namespace IRMAKit.Web
 				context = null;
 				Init(configFile, ref globalObj, false);
 				AppReloadEnd(context);
-				Logger.EVENT("Kit - Service reload successfully");
+				Logger.EVENT("Kit - Service reload successfully ({0})", ICall.GetWorkerIndex());
 			} else
 				ICall.Launched();
 		}
@@ -207,7 +207,7 @@ namespace IRMAKit.Web
 			GC.KeepAlive(context);
 		}
 
-		// FIX: It's public because it might be invoked directly on windows version.
+		// FIX: It's public because it might be invoked directly in windows version.
 		public void Handle()
 		{
 			bool isMock = context.OS.Equals("windows");
@@ -234,7 +234,7 @@ namespace IRMAKit.Web
 				throw e;
 			}
 			if (succLog)
-				Logger.EVENT("Kit - Service stop");
+				Logger.EVENT("Kit - Service stop ({0})", ICall.GetWorkerIndex());
 		}
 
 		private void Finalize()

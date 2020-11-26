@@ -333,7 +333,7 @@ void buf_free(void *data)
 static buf_t* buf_pool_lend(buf_pool_t *pool, unsigned int size, int auto_reset)
 {
 	/*
-	 * Different ways about how to ensure that the allocated memory of object got from pool will be released safely:
+	 * Different ways to ensure the allocated memory of object that got from pool be released safely:
 	 * +-------------------------+---------------------------------------+-----------------------------------------------+
 	 * |                         | AUTO                                  | ~AUTO                                         |
 	 * +-------------------------+---------------------------------------+-----------------------------------------------+

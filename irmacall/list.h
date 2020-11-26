@@ -26,6 +26,8 @@ struct __list {
 	litem_t*	(*put)(list_t *l, void *data, time_t timestamp);
 	void*		(*get)(list_t *l, time_t *timestamp);
 	litem_t*	(*index)(list_t *l, int i);
+	litem_t*	(*first)(list_t *l);
+	litem_t*	(*last)(list_t *l);
 	litem_t*	(*find)(list_t *l, list_dfind_t dfind, void *val);
 	litem_t**	(*findall)(list_t *l, list_dfind_t dfind, void *val, int *count);
 	int			(*apply)(list_t *l, list_dapply_t dapply, void *val);
@@ -35,6 +37,8 @@ struct __list {
 	int			(*append)(list_t *to, list_t *from);
 	int			(*count)(list_t *l);
 	int			(*isempty)(list_t *l);
+	int			(*isfirst)(list_t *l, litem_t *li);
+	int			(*islast)(list_t *l, litem_t *li);
 	int			(*clear)(list_t *l);
 	void**		(*toarray)(list_t *l, int *len);
 };

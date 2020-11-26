@@ -17,6 +17,7 @@
 #include "fuse.h"
 #include "service.h"
 
+#define HTTP_VERSION		"1.1"
 #define BMAX_DEFAULT		6*1024*1024
 #define LOGBUF_COUNT_MAX	500
 #define LOGBASE_ST_MAX		3600
@@ -43,6 +44,7 @@ do { \
 	__main_booting = v; \
 	pthread_cond_signal(&__boot_cond); \
 	pthread_mutex_unlock(&__boot_mutex); \
+	if (v < 0) kill(getpid(), SIGTERM); \
 } while (0)
 
 #define RELOAD_READY() \
@@ -432,7 +434,7 @@ static int console_printf(const char *fmt, ...)
 static int workers_reload()
 {
 	/* Reload the workers iteratively. */
-	worker_t *w = __workers->tail->data;
+	worker_t *w = (__workers->first(__workers))->data;
 	if (w->ppid <= 0)
 		return 0;
 	return pthread_kill(w->ppid, SIGUSR2) == 0;
@@ -448,7 +450,7 @@ static int main_reload()
 		return -1;
 	if (!workers_reload()) {
 		RELOAD_FAIL();
-		EVENT(g_log, "Core - Fail to reload");
+		ERROR(g_log, "Core - Fail to reload");
 		return 0;
 	}
 	__s->reload_times++;
@@ -509,7 +511,7 @@ static void sig_handle_main(int signo)
 
 	case SIGHUP:
 		if (main_reload() < 0) {
-			ERROR(g_log, "Core - Fail to reload and exit now");
+			FATAL(g_log, "Core - Fail to reload and exit now");
 			__exit();
 		}
 		break;
@@ -644,25 +646,22 @@ static void launch_info(worker_t *w, const char *app, const char *ver, long bmax
 
 static void boot_next(worker_t *w)
 {
-	litem_t *p = WI->this->link;
-	if (p == __workers->tail) {
+	if (__workers->islast(__workers, WI->this)) {
 		BOOT_DONE(0);
 		return;
 	}
-	w = p->data;
+	w = WI->this->link->data;
 	if (pthread_create(&w->ppid, 0, &worker_run, (void*)w) != 0)
 		BOOT_DONE(-1);
 }
 
 static void reload_next(worker_t *w)
 {
-	litem_t *p;
 	worker_t *curr = w;
 	for (;;) {
-		p = WI->this->link;
-		if (p == __workers->tail)
+		if (__workers->islast(__workers, WI->this))
 			break;
-		w = p->data;
+		w = WI->this->link->data;
 		if (w->ppid > 0 && WI->busy >= 0 && !pthread_kill(w->ppid, SIGUSR2))
 			return;
 	}
@@ -870,20 +869,19 @@ static int request_accept(worker_t *w)
 
 	int ret;
 	if (WI->cb) {
-		ret = WI->cb(w);
+		int (*f)(worker_t*) = WI->cb;
 		WI->cb = NULL;
-		if (ret < 0)
+		if ((ret = f(w)) < 0)
 			return -1;
+		if (WI->busy < 0)
+			return 0;
 	}
 
-	/* Refer to source of fcgi, it should exit. */
 	if ((ret = FCGX_Accept_r(&WI->req)) < 0) {
+		/* Refer to source of fcgi, it should exit. */
 		ERROR(w->log, "Core - Fail to accept request (ret:%d)", ret);
 		return -1;
 	}
-	/* busy will be -1 if reload is doing or was failed. */
-	if (WI->busy < 0)
-		return 0;
 	WI->busy = 1;
 	ret = request_basic_parse(w);
 	if (++WI->req_times < 0)
@@ -1184,7 +1182,7 @@ static void response_add_header(worker_t *w, const char *key, const char *value)
 	 * it (e.g. the gzip case etc). so, ignore it now.
 	 */
 	if (key && value && strcasecmp(key, "Content-Length")) {
-		/* cover=0, which will allow multi-values be set (such cookie) */
+		/* cover=0, which will allow multi-values to be set (such cookie) */
 		int cover = 0;
 		WI->res_header_param->set(WI->res_header_param, key, value, 0, cover);
 	}
@@ -1232,7 +1230,7 @@ static int send_header(worker_t *w)
 	 * buf_reset(WI->buf);
 	 * buf_append(WI->buf, ...);
 	 */
-	buf_printf(WI->buf, "%s", "HTTP/1.1 200 OK\r\nStatus: 200 OK\r\n");
+	buf_printf(WI->buf, "%s", "HTTP/%s 200 OK\r\nStatus: 200 OK\r\n", HTTP_VERSION);
 	WI->res_header_param->print(WI->res_header_param, &fill_headers, WI->buf);
 	if (!WI->res_header_param->find(WI->res_header_param, "Content-Type"))
 		buf_append(WI->buf, "Content-Type: text/html\r\n", 25);
@@ -1247,13 +1245,13 @@ static int redirect(worker_t *w, const char *location)
 	int len = strlen(location);
 	if (len <= 0)
 		return 0;
-	buf_printf(WI->buf, "HTTP/1.1 302 Moved Temporarily\r\nLocation: %s\r\n\r\n", location);
+	buf_printf(WI->buf, "HTTP/%s 302 Moved Temporarily\r\nLocation: %s\r\n\r\n", HTTP_VERSION, location);
 	return fcgi_send(WI->buf->data, WI->buf->offset, w);
 }
 
 static int __send_http(worker_t *w, int rescode, const char *desc, buf_t *content)
 {
-	buf_printf(WI->buf, "HTTP/1.1 %d %s\r\nStatus: %d %s\r\n", rescode, desc, rescode, desc);
+	buf_printf(WI->buf, "HTTP/%s %d %s\r\nStatus: %d %s\r\n", HTTP_VERSION, rescode, desc, rescode, desc);
 	WI->res_header_param->print(WI->res_header_param, &fill_headers, WI->buf);
 	if (!WI->res_header_param->find(WI->res_header_param, "Content-Type"))
 		buf_append(WI->buf, "Content-Type: text/html\r\n", 25);
@@ -1374,7 +1372,6 @@ static void* worker_run(void *args)
 	sig_install_worker();
 	if (__s->sopt->app_init(w) < 0) {
 		BOOT_DONE(-1);
-		kill(getpid(), SIGTERM);
 		return NULL;
 	}
 	/*
@@ -1551,8 +1548,8 @@ static int workers_boot()
 		litem_t *p = __workers->put(__workers, NULL, 0L);
 		p->data = worker_new(i, p);
 	}
-	/* Boot the workers iteratively. */
-	worker_t *w = __workers->tail->data;
+	/* Note to start booting from the first one of which the index is 0. */
+	worker_t *w = (__workers->first(__workers))->data;
 	return pthread_create(&w->ppid, 0, &worker_run, (void*)w) == 0;
 }
 
@@ -1564,7 +1561,7 @@ static int spirit_boot()
 	 */
 	spirit_t *p = &__spirit;
 	memset(p, 0, sizeof(spirit_t));
-	worker_t *w = (worker_t*)__workers->tail->link->data;
+	worker_t *w = (__workers->first(__workers))->data;
 	p->bmax = WI->bmax;
 	p->today = today();
 	p->gc_lasttime = time(NULL);
