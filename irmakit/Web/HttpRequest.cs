@@ -591,25 +591,39 @@ namespace IRMAKit.Web
 
 		private HttpCookieCollection ParseCookie(string cookieStr)
 		{
+			if (string.IsNullOrEmpty(cookieStr))
+				return null;
 			HttpCookieCollection cookies = new HttpCookieCollection();
-			if (!string.IsNullOrEmpty(cookieStr)) {
-				string[] items = cookieStr.Split(new char[]{';'});
-				foreach (string item in items) {
-					HttpCookie cookie = ParseCookieItem(item);
-					if (cookie != null)
-						cookies.Add(cookie);
-				}
+			string[] items = cookieStr.Split(new char[]{';'});
+			foreach (string item in items) {
+				HttpCookie cookie = ParseCookieItem(item);
+				if (cookie != null)
+					cookies.Add(cookie);
 			}
 			return cookies;
 		}
 
+		public bool XCookies = false;
 		private HttpCookieCollection cookies;
 		public HttpCookieCollection Cookies
 		{
+			/*
+			 * In some cases the client can't request with cookies and get the response cookies that
+			 * are set by web service side. Especially in the case of mobile APP, you have to do it
+			 * by sending tokens. In irma, we can use the extended cookie 'x-cookie' in request and
+			 * 'set-x-cookie' in response  to achieve it. Event the first time you login, you can also
+			 * request API with a definite header of 'x-cookie' and of which the key and value may be
+			 * anything such as 'x-cookie: k=v'. It'll ensure that the client can fetch the session-cookie
+			 * when the login is successful. Souce about handling 'set-x-cookie' you might refer to the
+			 * AddHeaderOfCookies() method of HttpResonse.cs.
+			 */
 			get {
 				if (this.cookies == null) {
 					//this.cookies = ParseCookie("fooSessionId=sid-12345678; expires=Sat, 02 May 2009 23:38:25 GMT");
-					this.cookies = ParseCookie(Http.GetRequestParam("HTTP_COOKIE"));
+					if ((this.cookies = ParseCookie(Http.GetRequestParam("HTTP_COOKIE"))) == null) {
+						if ((this.cookies = ParseCookie(Http.GetRequestParam("HTTP_X_COOKIE"))) != null)
+							XCookies = true;
+					}
 				}
 				return this.cookies;
 			}

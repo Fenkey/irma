@@ -198,7 +198,7 @@ namespace IRMAKit.Web
 				if (cookie.HttpOnly)
 					sb.Append("; HttpOnly");
 
-				Http.AddResponseHeader("Set-Cookie", sb.ToString());
+				Http.AddResponseHeader(request.XCookies ? "Set-X-Cookie" : "Set-Cookie", sb.ToString());
 			}
 		}
 
