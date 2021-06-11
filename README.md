@@ -2,6 +2,10 @@
 
 IRMA, an efficient web service framework, which originated from a business project and was created because of the comprehensive reasons such as the requirement of enterprise to adopt .Net, SaaS & cloud automated deployment and Linux running environment etc. IRMA is built on the Mono and the FastCGI. It uses Mono to implement the parsing and execution of C# code on Linux, and utilizes the FastCGI and Nginx to deal with the HTTP interaction. There are two parts of IRMA: `irmacall`, a multithreading scheduling engine written in C, and `irmakit`, a development framework written in C#. `irmacall` is responsible for launching & scheduling all kinds of web applications developed on `irmakit` framework. The design concept of IRMA is: ***Simple and efficient scheduling, on-demand integration and expansion***, which really makes the IRMA look more like a toolkit than a framework (In fact, it is a toolkit). Anyway, I hope it's useful to you :-)
 
+## Architecture diagrams
+![irmacall-architecture](./images/irmacall-architecture.png)
+![irmakit-architecture](./images/irmakit-architecture.png)
+
 ## Compilation & Installation
 
 Configure it at first:
@@ -72,7 +76,7 @@ The source links of above dependencies might refer as below:
 * `memcached`: <a src="https://libmemcached.org/">https://libmemcached.org/</a>
 * `hiredis`: <a src="https://github.com/redis/hiredis.git">https://github.com/redis/hiredis.git</a>
 
-> Note to add SSL support (`--with-ssl`) when you compile libcurl. Because libcurl does not support the DNS asynchronous resolusion, you have to utilize the way of `signal`, or the third party package of `c-ares` that is the official recommendation of libcurl. We follow the advice to use `c-ares`:
+> Pay attention to add SSL support (`--with-ssl`) when you compile libcurl. Because libcurl does not support the DNS asynchronous resolusion, you have to utilize the way of `signal`, or the third party package of `c-ares` that is the official recommendation of libcurl. We follow the advice to use `c-ares`:
 
 ```bash
 $ ./configure --prefix=$HOME/local/c-ares --enable-static
@@ -199,9 +203,9 @@ $ cat Bin/Debug/log/event/irma_20200903.log
 [15:01:38,875149|032299|7f0153fff700] Kit - Service start
 ```
 
-Note if you choose to support `loghourly` in `make config`, the log file name of above will be like `irma_2020090315.log`. Supporting `loghourly` will cause log files to be generated every hour.
+Note: If you choose to support `loghourly` in `make config`, the log file name of above will be like `irma_2020090315.log`. Supporting `loghourly` will cause log files to be generated every hour.
 
-Configure the nginx (Note to reload or restart it):
+Configure the nginx (Remember to reload or restart it):
 
 ```bash
 server {
